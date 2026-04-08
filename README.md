@@ -86,6 +86,10 @@ Input (User Prefs + songs.csv)
   → Output: Ranked Recommendations (song, score, explanation)
 ```
 
+### Sample Output
+
+![Terminal output showing top 5 recommendations for a pop/happy profile](screenshot_1.png)
+
 ### Known Biases
 
 - **Genre dominance:** At 0.35 weight, genre is the single largest signal. A song that matches genre but has the wrong mood and poor energy can still outscore a song with a perfect energy match and no genre match. Great songs in the "wrong" genre are systematically underranked.
