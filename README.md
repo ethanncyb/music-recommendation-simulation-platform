@@ -17,17 +17,57 @@ Replace this paragraph with your own summary of what your version does.
 
 ## How The System Works
 
-Explain your design in plain language.
+Real world recommendation systems, like those used by Spotify and YouTube, typically combine multiple approaches to suggest content. They rely on collaborative filtering to learn from the behavior of similar users, as well as content based methods that analyze features such as genre, mood, and energy. These signals are then combined and ranked to balance relevance, engagement, and occasional novelty. In my project, the focus is on the content based approach, prioritizing direct alignment with a user’s stated preferences and providing clear explanations for each recommendation so the reasoning behind every suggestion is easy to understand.
 
-Some prompts to answer:
+### Song Features
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+Each `Song` stores 9 attributes loaded from `data/songs.csv`:
 
-You can include a simple diagram or bullet list if helpful.
+| Feature | Type | Description |
+|---------|------|-------------|
+| `genre` | string | Musical style (pop, lofi, rock, jazz, ambient, synthwave, indie pop) |
+| `mood` | string | Emotional tone (happy, chill, intense, relaxed, moody, focused) |
+| `energy` | float 0–1 | Perceived intensity and activity level |
+| `tempo_bpm` | float | Beats per minute (~60–152) |
+| `valence` | float 0–1 | Musical positiveness |
+| `danceability` | float 0–1 | How suitable the song is for dancing |
+| `acousticness` | float 0–1 | How acoustic (vs. electronic/produced) the song sounds |
+
+### User Profile
+
+A `UserProfile` stores four preference fields that drive the scoring:
+
+- `favorite_genre` — the genre the user most wants to hear
+- `favorite_mood` — the emotional tone the user is seeking right now
+- `target_energy` — a float 0–1 representing the user's preferred intensity level
+- `likes_acoustic` — a boolean indicating whether the user prefers acoustic or produced sounds
+
+### Scoring Rule (one song at a time)
+
+The recommender computes a score in [0, 1] for each song using a weighted combination of four signals:
+
+```
+score = (0.35 × genre_match)
+      + (0.30 × mood_match)
+      + (0.25 × energy_proximity)
+      + (0.10 × acoustic_fit)
+```
+
+- **Genre and mood** are binary signals — 1.0 if the song matches the user's preference, 0.0 if not.
+- **Energy** uses a *proximity formula* that rewards closeness to the user's target, not just higher or lower values:
+  ```
+  energy_score = 1 - |song.energy - user.target_energy|
+  ```
+  A song at 0.82 scores higher than one at 0.93 for a user who wants 0.80, even though 0.93 is "more energetic." The gap matters, not the direction.
+- **Acoustic fit** maps the boolean preference to a continuous score: `song.acousticness` if the user likes acoustic, `1 - song.acousticness` if they don't.
+
+### Ranking Rule (choosing which songs to recommend)
+
+1. Score every song in the catalog using the Scoring Rule
+2. Sort all songs descending by score
+3. Return the top-k songs with their scores and explanations
+
+Every song gets scored — no pre-filtering — so a surprisingly good match is never missed.
 
 ---
 
