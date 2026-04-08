@@ -38,12 +38,27 @@ class Recommender:
         self.songs = songs
 
     def recommend(self, user: UserProfile, k: int = 5) -> List[Song]:
-        # TODO: Implement recommendation logic
-        return self.songs[:k]
+        """Returns the top-k songs sorted by score descending."""
+        user_prefs = {
+            "genre": user.favorite_genre,
+            "mood": user.favorite_mood,
+            "energy": user.target_energy,
+            "likes_acoustic": user.likes_acoustic,
+        }
+        scored = [(song, score_song(user_prefs, song.__dict__)[0]) for song in self.songs]
+        scored.sort(key=lambda x: x[1], reverse=True)
+        return [song for song, _ in scored[:k]]
 
     def explain_recommendation(self, user: UserProfile, song: Song) -> str:
-        # TODO: Implement explanation logic
-        return "Explanation placeholder"
+        """Returns a human-readable explanation of why the song was recommended."""
+        user_prefs = {
+            "genre": user.favorite_genre,
+            "mood": user.favorite_mood,
+            "energy": user.target_energy,
+            "likes_acoustic": user.likes_acoustic,
+        }
+        _, reasons = score_song(user_prefs, song.__dict__)
+        return "; ".join(reasons)
 
 def load_songs(csv_path: str) -> List[Dict]:
     """Reads songs from a CSV file and returns a list of dicts with typed fields."""
@@ -116,10 +131,11 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     return (score, reasons)
 
 def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tuple[Dict, float, str]]:
-    """
-    Functional implementation of the recommendation logic.
-    Required by src/main.py
-    """
-    # TODO: Implement scoring and ranking logic
-    # Expected return format: (song_dict, score, explanation)
-    return []
+    """Scores all songs, sorts descending, and returns the top-k as (song, score, explanation) tuples."""
+    scored = []
+    for song in songs:
+        score, reasons = score_song(user_prefs, song)
+        explanation = "; ".join(reasons)
+        scored.append((song, score, explanation))
+    scored.sort(key=lambda x: x[1], reverse=True)
+    return scored[:k]
