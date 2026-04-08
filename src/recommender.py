@@ -123,10 +123,10 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     if not reasons:
         reasons.append("Limited match to your preferences")
 
-    score = (0.35 * genre_score
-           + 0.30 * mood_score
-           + 0.25 * energy_score
-           + 0.10 * acoustic_score)
+    score = (0.16 * genre_score
+           + 0.28 * mood_score
+           + 0.47 * energy_score
+           + 0.09 * acoustic_score)
 
     return (score, reasons)
 

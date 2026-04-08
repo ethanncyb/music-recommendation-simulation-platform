@@ -25,8 +25,8 @@ Each `Song` stores 9 attributes loaded from `data/songs.csv`:
 
 | Feature | Type | Description |
 |---------|------|-------------|
-| `genre` | string | Musical style — 27 genres including pop, lofi, rock, jazz, ambient, hip-hop, edm, metal, classical, reggae, funk, and more |
-| `mood` | string | Emotional tone — 25 moods including happy, chill, intense, relaxed, euphoric, nostalgic, angry, romantic, and more |
+| `genre` | string | Musical style (27 genres including pop, lofi, rock, jazz, ambient, hip-hop, edm, metal, classical, reggae, funk, and more) |
+| `mood` | string | Emotional tone (25 moods including happy, chill, intense, relaxed, euphoric, nostalgic, angry, romantic, and more) |
 | `energy` | float 0–1 | Perceived intensity and activity level |
 | `tempo_bpm` | float | Beats per minute (~58–168) |
 | `valence` | float 0–1 | Musical positiveness |
@@ -39,10 +39,10 @@ Each `Song` stores 9 attributes loaded from `data/songs.csv`:
 
 A `UserProfile` stores four preference fields that drive the scoring:
 
-- `favorite_genre` — the genre the user most wants to hear
-- `favorite_mood` — the emotional tone the user is seeking right now
-- `target_energy` — a float 0–1 representing the user's preferred intensity level
-- `likes_acoustic` — a boolean indicating whether the user prefers acoustic or produced sounds
+- `favorite_genre`: the genre the user most wants to hear
+- `favorite_mood`: the emotional tone the user is seeking right now
+- `target_energy`: a float 0–1 representing the user's preferred intensity level
+- `likes_acoustic`: a boolean indicating whether the user prefers acoustic or produced sounds
 
 ### Scoring Rule (one song at a time)
 
@@ -55,7 +55,7 @@ score = (0.35 × genre_match)
       + (0.10 × acoustic_fit)
 ```
 
-- **Genre and mood** are binary signals — 1.0 if the song matches the user's preference, 0.0 if not.
+- **Genre and mood** are binary signals: 1.0 if the song matches the user's preference, 0.0 if not.
 - **Energy** uses a *proximity formula* that rewards closeness to the user's target, not just higher or lower values:
   ```
   energy_score = 1 - |song.energy - user.target_energy|
@@ -69,11 +69,11 @@ score = (0.35 × genre_match)
 2. Sort all songs descending by score
 3. Return the top-k songs with their scores and explanations
 
-Every song gets scored — no pre-filtering — so a surprisingly good match is never missed.
+Every song gets scored (no pre-filtering), so a surprisingly good match is never missed.
 
 ### Data Flow
 
-See [`flowchart.md`](flowchart.md) for the full Mermaid.js diagram. The flow in brief:
+See [`flowchart.md`](docs/flowchart.md) for the full Mermaid.js diagram. The flow in brief:
 
 ```
 Input (User Prefs + songs.csv)
@@ -88,14 +88,35 @@ Input (User Prefs + songs.csv)
 
 ### Sample Output
 
-![Terminal output showing top 5 recommendations for a pop/happy profile](screenshot_1.png)
+![Terminal output showing top 5 recommendations for a pop/happy profile](pics/sample_output.png)
+
+### Stress Test: Diverse Profiles
+
+Four distinct user profiles were run to evaluate the recommender's behavior across different taste shapes, including one adversarial edge case.
+
+**High-Energy Pop** (`genre=pop`, `mood=happy`, `energy=0.9`, `likes_acoustic=False`)
+
+![High-Energy Pop profile recommendations](pics/diverse_profiles_1.png)
+
+**Chill Lofi** (`genre=lofi`, `mood=chill`, `energy=0.2`, `likes_acoustic=True`)
+
+![Chill Lofi profile recommendations](pics/diverse_profiles_2.png)
+
+**Deep Intense Rock** (`genre=rock`, `mood=angry`, `energy=0.95`, `likes_acoustic=False`)
+
+![Deep Intense Rock profile recommendations](pics/diverse_profiles_3.png)
+
+**Conflicted Listener (Edge Case)** (`genre=classical`, `mood=sad`, `energy=0.9`, `likes_acoustic=True`)  
+*Adversarial profile: classical music is naturally low-energy, but this profile requests high energy (0.9), designed to surface conflicts in the scoring logic.*
+
+![Conflicted Listener edge case profile recommendations](pics/diverse_profiles_4.png)
 
 ### Known Biases
 
 - **Genre dominance:** At 0.35 weight, genre is the single largest signal. A song that matches genre but has the wrong mood and poor energy can still outscore a song with a perfect energy match and no genre match. Great songs in the "wrong" genre are systematically underranked.
-- **Catalog sparsity amplifies energy:** With 27 unique genres across 30 songs, most genre queries match only 1–2 songs. For the remaining 28+ songs that score 0 on genre, energy (0.25 weight) becomes the primary differentiator — giving it more practical influence than its weight suggests.
+- **Catalog sparsity amplifies energy:** With 27 unique genres across 30 songs, most genre queries match only 1–2 songs. For the remaining 28+ songs that score 0 on genre, energy (0.25 weight) becomes the primary differentiator, giving it more practical influence than its weight suggests.
 - **Mood granularity:** 25 unique moods means most moods appear only once. A user seeking "nostalgic" gets exactly one mood match; all other songs are judged on energy and acoustic alone.
-- **No cross-feature interaction:** The system treats genre and mood as independent. It cannot detect that "chill lofi" and "intense rock" are meaningfully different combinations — a song can score well on genre alone without capturing the session's emotional intent.
+- **No cross-feature interaction:** The system treats genre and mood as independent. It cannot detect that "chill lofi" and "intense rock" are meaningfully different combinations; a song can score well on genre alone without capturing the session's emotional intent.
 
 ---
 
