@@ -1,31 +1,101 @@
 id,title,artist,genre,mood,energy,tempo_bpm,valence,danceability,acousticness,instrumentalness,speechiness,popularity,release_year,key_signature,time_signature,detailed_moods
 1,Sunrise City,Neon Echo,pop,happy,0.82,118,0.84,0.79,0.18,0.02,0.05,75,2023,C Major,4,happy|upbeat|bright
 2,Midnight Coding,LoRoom,lofi,chill,0.42,78,0.56,0.62,0.71,0.85,0.03,60,2021,A Minor,4,chill|focused|ambient
-3,Storm Runner,Voltline,rock,intense,0.91,152,0.48,0.66,0.10,0.05,0.08,55,2018,E Minor,4,intense|aggressive|driving
-4,Library Rain,Paper Lanterns,lofi,chill,0.35,72,0.60,0.58,0.86,0.90,0.04,65,2022,D Major,4,chill|peaceful|rainy
+3,Storm Runner,Voltline,rock,intense,0.91,152,0.48,0.66,0.1,0.05,0.08,55,2018,E Minor,4,intense|aggressive|driving
+4,Library Rain,Paper Lanterns,lofi,chill,0.35,72,0.6,0.58,0.86,0.9,0.04,65,2022,D Major,4,chill|peaceful|rainy
 5,Gym Hero,Max Pulse,pop,intense,0.93,132,0.77,0.88,0.05,0.01,0.12,80,2024,G Minor,4,intense|energetic|motivating
 6,Spacewalk Thoughts,Orbit Bloom,ambient,chill,0.28,60,0.65,0.41,0.92,0.95,0.02,45,2020,F Major,4,chill|ethereal|drifting
 7,Coffee Shop Stories,Slow Stereo,jazz,relaxed,0.37,90,0.71,0.54,0.89,0.75,0.03,58,2019,Bb Major,4,relaxed|cozy|warm
-8,Night Drive Loop,Neon Echo,synthwave,moody,0.75,110,0.49,0.73,0.22,0.80,0.04,70,2021,C Minor,4,moody|driving|retro
-9,Focus Flow,LoRoom,lofi,focused,0.40,80,0.59,0.60,0.78,0.88,0.05,62,2023,A Minor,4,focused|steady|calm
+8,Night Drive Loop,Neon Echo,synthwave,moody,0.75,110,0.49,0.73,0.22,0.8,0.04,70,2021,C Minor,4,moody|driving|retro
+9,Focus Flow,LoRoom,lofi,focused,0.4,80,0.59,0.6,0.78,0.88,0.05,62,2023,A Minor,4,focused|steady|calm
 10,Rooftop Lights,Indigo Parade,indie pop,happy,0.76,124,0.81,0.82,0.35,0.04,0.06,68,2022,E Major,4,happy|breezy|carefree
-11,Golden Chain,Flow State,hip-hop,confident,0.78,95,0.72,0.85,0.08,0.00,0.45,85,2023,D Minor,4,confident|bouncy|bold
+11,Golden Chain,Flow State,hip-hop,confident,0.78,95,0.72,0.85,0.08,0.0,0.45,85,2023,D Minor,4,confident|bouncy|bold
 12,Moonlit Sonata,Clara Voss,classical,peaceful,0.22,58,0.68,0.28,0.97,0.98,0.01,50,2017,C# Minor,3,peaceful|melancholy|elegant
 13,Velvet Hour,Sable & June,r&b,romantic,0.55,88,0.76,0.67,0.42,0.02,0.08,72,2022,F# Minor,4,romantic|smooth|sensual
 14,Dusty Road Home,The Pines,country,nostalgic,0.44,96,0.63,0.52,0.81,0.01,0.04,64,2015,G Major,4,nostalgic|acoustic|heartfelt
-15,Overdrive,Pulse Theory,edm,euphoric,0.96,140,0.82,0.94,0.03,0.60,0.06,78,2024,B Minor,4,euphoric|explosive|hypnotic
-16,Hollow Rain,Ember Frost,folk,sad,0.30,68,0.32,0.38,0.88,0.05,0.04,48,2019,A Minor,4,sad|introspective|raw
+15,Overdrive,Pulse Theory,edm,euphoric,0.96,140,0.82,0.94,0.03,0.6,0.06,78,2024,B Minor,4,euphoric|explosive|hypnotic
+16,Hollow Rain,Ember Frost,folk,sad,0.3,68,0.32,0.38,0.88,0.05,0.04,48,2019,A Minor,4,sad|introspective|raw
 17,Iron Curtain,Nocturn,metal,angry,0.95,168,0.35,0.58,0.06,0.08,0.15,52,2016,D Minor,4,angry|heavy|dark
 18,Island Echo,Coral Drift,reggae,dreamy,0.52,82,0.74,0.63,0.55,0.03,0.09,59,2020,C Major,4,dreamy|laid-back|sunny
-19,La Rebelion,Joe Arroyo,salsa,energetic,0.85,104,0.90,0.75,0.15,0.02,0.06,77,1986,G Minor,4,energetic|classic|danceable
+19,La Rebelion,Joe Arroyo,salsa,energetic,0.85,104,0.9,0.75,0.15,0.02,0.06,77,1986,G Minor,4,energetic|classic|danceable
 20,Superstition,Stevie Wonder,funk,groovy,0.79,101,0.88,0.82,0.05,0.05,0.08,92,1972,Eb Minor,4,groovy|iconic|funky
 21,Smells Like Teen Spirit,Nirvana,grunge,rebellious,0.95,117,0.45,0.48,0.01,0.01,0.06,95,1991,F Minor,4,rebellious|angsty|raw
-22,Water,Tyla,amapiano,sensual,0.70,117,0.60,0.85,0.20,0.03,0.07,89,2023,G Minor,4,sensual|rhythmic|trendy
+22,Water,Tyla,amapiano,sensual,0.7,117,0.6,0.85,0.2,0.03,0.07,89,2023,G Minor,4,sensual|rhythmic|trendy
 23,The Girl from Ipanema,Stan Getz & Joao Gilberto,bossa nova,relaxed,0.25,129,0.55,0.58,0.85,0.25,0.04,83,1964,Db Major,4,relaxed|smooth|breezy
 24,Stayin' Alive,Bee Gees,disco,upbeat,0.82,104,0.95,0.88,0.03,0.02,0.05,91,1977,F Minor,4,upbeat|groovy|strutting
-25,God's Plan,Drake,trap,reflective,0.45,77,0.35,0.75,0.05,0.00,0.35,94,2018,C Major,4,reflective|triumphant|bouncy
-26,I Walk The Line,Johnny Cash,rockabilly,steadfast,0.50,105,0.70,0.65,0.75,0.01,0.04,82,1956,F Major,4,steadfast|classic|earnest
-27,Ddu-Du Ddu-Du,BLACKPINK,k-pop,fierce,0.88,140,0.65,0.78,0.02,0.00,0.20,90,2018,E Minor,4,fierce|confident|explosive
+25,God's Plan,Drake,trap,reflective,0.45,77,0.35,0.75,0.05,0.0,0.35,94,2018,C Major,4,reflective|triumphant|bouncy
+26,I Walk The Line,Johnny Cash,rockabilly,steadfast,0.5,105,0.7,0.65,0.75,0.01,0.04,82,1956,F Major,4,steadfast|classic|earnest
+27,Ddu-Du Ddu-Du,BLACKPINK,k-pop,fierce,0.88,140,0.65,0.78,0.02,0.0,0.2,90,2018,E Minor,4,fierce|confident|explosive
 28,A Message to You Rudy,The Specials,ska,laid-back,0.55,75,0.68,0.72,0.25,0.15,0.08,74,1979,C Major,4,laid-back|bouncy|classic
 29,Oye Como Va,Santana,latin rock,festive,0.75,130,0.85,0.65,0.35,0.65,0.04,86,1970,A Minor,4,festive|groovy|jamming
-30,Blue Monday,New Order,synth-pop,brooding,0.85,130,0.40,0.78,0.02,0.55,0.04,88,1983,F Major,4,brooding|driving|iconic
+30,Blue Monday,New Order,synth-pop,brooding,0.85,130,0.4,0.78,0.02,0.55,0.04,88,1983,F Major,4,brooding|driving|iconic
+31,Bohemian Rhapsody,Queen,rock,epic,0.59,140,0.18,0.32,0.04,0.01,0.06,84,1976,E Minor,4,epic|classic|rock
+32,Billie Jean,Michael Jackson,pop,groovy,0.64,130,0.73,0.71,0.35,0.06,0.05,89,1985,F# Minor,4,groovy|classic|pop
+33,Hotel California,Eagles,rock,moody,0.49,124,0.36,0.5,0.15,0.17,0.02,80,1977,A Minor,4,moody|classic|rock
+34,Smells Like Teen Spirit,Nirvana,grunge,rebellious,0.66,138,0.32,0.55,0.14,0.13,0.08,81,1991,Bb Major,4,rebellious|classic|grunge
+35,Sweet Child O' Mine,Guns N' Roses,rock,energetic,0.9,160,0.2,0.43,0.01,0.01,0.06,79,1984,C Major,4,energetic|classic|rock
+36,Take Five,Dave Brubeck,jazz,relaxed,0.4,93,0.18,0.46,0.8,0.37,0.04,81,1967,E Minor,3,relaxed|classic|jazz
+37,So What,Miles Davis,jazz,chill,0.16,95,0.27,0.43,0.84,0.47,0.03,81,1959,C# Minor,4,chill|classic|jazz
+38,Clair de Lune,Claude Debussy,classical,peaceful,0.36,73,0.25,0.6,0.86,0.76,0.07,79,1905,E Minor,4,peaceful|classic|classical
+39,Symphony No. 5,Ludwig van Beethoven,classical,intense,0.49,110,0.16,0.59,0.92,0.74,0.03,96,1808,B Minor,4,intense|classic|classical
+40,One More Time,Daft Punk,electronic,euphoric,0.87,116,0.76,0.77,0.04,0.87,0.04,81,2022,G Minor,4,euphoric|classic|electronic
+41,Strobe,deadmau5,electronic,euphoric,0.84,121,0.62,0.64,0.08,0.88,0.07,95,2013,G Minor,4,euphoric|classic|electronic
+42,Levels,Avicii,electronic,happy,0.83,120,0.74,0.95,0.09,0.83,0.03,89,2009,C# Minor,4,happy|classic|electronic
+43,Lose Yourself,Eminem,hip-hop,intense,0.74,86,0.27,0.72,0.25,0.06,0.21,91,2011,F# Minor,4,intense|classic|hip-hop
+44,Juicy,The Notorious B.I.G.,hip-hop,chill,0.73,97,0.26,0.71,0.16,0.06,0.44,80,1995,G Minor,4,chill|classic|hip-hop
+45,HUMBLE.,Kendrick Lamar,hip-hop,aggressive,0.83,80,0.22,0.89,0.19,0.06,0.36,96,2007,F Major,4,aggressive|classic|hip-hop
+46,N.Y. State of Mind,Nas,hip-hop,gritty,0.81,91,0.2,0.66,0.27,0.05,0.45,91,2000,C Major,4,gritty|classic|hip-hop
+47,Blinding Lights,The Weeknd,synthwave,energetic,0.83,124,0.39,0.42,0.2,0.07,0.07,80,2022,Eb Major,4,energetic|classic|synthwave
+48,Toxic,Britney Spears,pop,energetic,0.57,106,0.14,0.74,0.46,0.06,0.05,83,2016,A Minor,4,energetic|classic|pop
+49,Bad Romance,Lady Gaga,pop,intense,0.72,94,0.26,0.78,0.4,0.03,0.03,96,2012,B Minor,4,intense|classic|pop
+50,Shape of You,Ed Sheeran,pop,happy,0.56,91,0.92,0.67,0.13,0.06,0.03,85,2012,Bb Major,4,happy|classic|pop
+51,Someone Like You,Adele,pop,sad,0.31,110,0.4,0.69,0.16,0.07,0.05,77,2022,Eb Major,4,sad|classic|pop
+52,Rolling in the Deep,Adele,pop,moody,0.56,118,0.31,0.83,0.35,0.02,0.07,93,2006,Bb Major,4,moody|classic|pop
+53,Respect,Aretha Franklin,rnb,empowering,0.57,121,0.11,0.43,0.34,0.04,0.03,93,2021,C Major,4,empowering|classic|rnb
+54,What's Going On,Marvin Gaye,rnb,soulful,0.67,116,0.33,0.43,0.22,0.06,0.07,79,2018,C# Minor,4,soulful|classic|rnb
+55,Let's Get It On,Marvin Gaye,rnb,romantic,0.75,109,0.3,0.34,0.5,0.0,0.03,82,2008,B Minor,4,romantic|classic|rnb
+56,I Will Always Love You,Whitney Houston,rnb,emotional,0.48,91,0.22,0.36,0.17,0.06,0.06,94,1982,F# Minor,4,emotional|classic|rnb
+57,Master of Puppets,Metallica,metal,aggressive,0.95,137,0.33,0.42,0.02,0.12,0.05,77,1982,G Minor,4,aggressive|classic|metal
+58,Enter Sandman,Metallica,metal,intense,0.9,144,0.17,0.54,0.1,0.02,0.06,83,1987,G Minor,4,intense|classic|metal
+59,Paranoid,Black Sabbath,metal,chaotic,0.77,126,0.17,0.51,0.06,0.07,0.03,78,1976,B Minor,4,chaotic|classic|metal
+60,Chop Suey!,System of a Down,metal,chaotic,0.8,105,0.17,0.47,0.09,0.13,0.07,86,2011,A Minor,4,chaotic|classic|metal
+61,Wonderwall,Oasis,rock,nostalgic,0.47,121,0.13,0.36,0.0,0.12,0.05,96,1991,D Major,4,nostalgic|classic|rock
+62,Creep,Radiohead,rock,sad,0.44,154,0.29,0.59,0.07,0.16,0.06,98,1999,G Major,4,sad|classic|rock
+63,Imagine,John Lennon,pop,peaceful,0.75,105,0.11,0.79,0.27,0.05,0.03,84,2018,E Minor,4,peaceful|classic|pop
+64,Hey Jude,The Beatles,rock,uplifting,0.5,145,0.66,0.57,0.13,0.06,0.03,96,1960,G Major,4,uplifting|classic|rock
+65,Let It Be,The Beatles,rock,peaceful,0.58,145,0.38,0.51,0.77,0.18,0.03,93,1966,Bb Major,4,peaceful|classic|rock
+66,Come Together,The Beatles,rock,groovy,0.45,124,0.76,0.31,0.13,0.06,0.04,79,1959,Eb Major,4,groovy|classic|rock
+67,Purple Haze,Jimi Hendrix,rock,trippy,0.51,121,0.39,0.4,0.07,0.15,0.05,94,1967,C Major,4,trippy|classic|rock
+68,Stairway to Heaven,Led Zeppelin,rock,epic,0.58,111,0.23,0.47,0.11,0.07,0.08,95,1971,C Major,4,epic|classic|rock
+69,Back In Black,AC/DC,rock,energetic,0.74,110,0.38,0.37,0.03,0.01,0.06,75,2015,C# Minor,4,energetic|classic|rock
+70,Thunderstruck,AC/DC,rock,intense,0.76,113,0.29,0.48,0.02,0.09,0.03,85,2010,G Major,4,intense|classic|rock
+71,Comfortably Numb,Pink Floyd,rock,trippy,0.51,137,0.19,0.43,0.0,0.18,0.03,99,1978,Bb Major,4,trippy|classic|rock
+72,Wish You Were Here,Pink Floyd,rock,nostalgic,0.41,145,0.1,0.53,0.09,0.06,0.06,99,1976,C Major,4,nostalgic|classic|rock
+73,Ring of Fire,Johnny Cash,country,classic,0.69,110,0.27,0.43,0.47,0.0,0.06,82,2023,F Major,4,classic|classic|country
+74,Jolene,Dolly Parton,country,emotional,0.23,92,0.26,0.31,0.39,0.08,0.04,78,2001,F# Minor,4,emotional|classic|country
+75,"Take Me Home, Country Roads",John Denver,country,nostalgic,0.64,106,0.37,0.56,0.44,0.04,0.04,91,2018,Bb Major,4,nostalgic|classic|country
+76,"No Woman, No Cry",Bob Marley,reggae,uplifting,0.51,109,0.83,0.43,0.41,0.09,0.02,83,2010,E Minor,4,uplifting|classic|reggae
+77,Three Little Birds,Bob Marley,reggae,happy,0.51,115,0.8,0.33,0.4,0.08,0.05,98,2005,C Major,4,happy|classic|reggae
+78,Is This Love,Bob Marley,reggae,romantic,0.67,104,0.26,0.31,0.44,0.04,0.07,78,2006,G Major,4,romantic|classic|reggae
+79,Thriller,Michael Jackson,pop,groovy,0.58,111,0.82,0.9,0.16,0.07,0.06,77,1987,G Minor,4,groovy|classic|pop
+80,Beat It,Michael Jackson,pop,energetic,0.6,116,0.2,0.79,0.3,0.0,0.03,75,1980,B Minor,4,energetic|classic|pop
+81,Like a Prayer,Madonna,pop,uplifting,0.87,90,0.88,0.86,0.32,0.04,0.05,75,1988,F Major,4,uplifting|classic|pop
+82,Vogue,Madonna,pop,groovy,0.72,125,0.65,0.69,0.13,0.05,0.07,99,1986,Bb Major,4,groovy|classic|pop
+83,I Wanna Dance with Somebody,Whitney Houston,pop,euphoric,0.51,128,0.89,0.95,0.15,0.03,0.04,94,1985,G Minor,4,euphoric|classic|pop
+84,Don't Stop Believin',Journey,rock,uplifting,0.64,157,0.78,0.42,0.13,0.05,0.07,76,2002,C Major,4,uplifting|classic|rock
+85,Livin' on a Prayer,Bon Jovi,rock,energetic,0.96,144,0.33,0.56,0.01,0.07,0.08,84,2013,A Minor,4,energetic|classic|rock
+86,Every Breath You Take,The Police,rock,moody,0.51,118,0.39,0.5,0.14,0.0,0.08,88,2018,Bb Major,4,moody|classic|rock
+87,Under Pressure,Queen & David Bowie,rock,emotional,0.64,127,0.13,0.45,0.05,0.08,0.05,84,2003,Eb Major,4,emotional|classic|rock
+88,Heroes,David Bowie,rock,epic,0.54,118,0.19,0.48,0.04,0.02,0.08,77,2007,C# Minor,4,epic|classic|rock
+89,Space Oddity,David Bowie,rock,trippy,0.42,116,0.23,0.45,0.09,0.18,0.07,78,2000,G Major,4,trippy|classic|rock
+90,Dancing Queen,ABBA,pop,happy,0.54,107,0.88,0.92,0.42,0.08,0.05,78,1977,C# Minor,4,happy|classic|pop
+91,Mamma Mia,ABBA,pop,happy,0.71,122,0.68,0.8,0.39,0.09,0.07,76,1976,F# Minor,4,happy|classic|pop
+92,Stayin' Alive,Bee Gees,disco,groovy,0.75,125,0.75,0.93,0.05,0.84,0.04,91,2020,F Major,4,groovy|classic|disco
+93,I Will Survive,Gloria Gaynor,disco,empowering,0.93,121,0.32,0.89,0.03,0.7,0.03,82,2002,G Major,4,empowering|classic|disco
+94,Super Freak,Rick James,funk,groovy,0.76,120,0.7,0.71,0.15,0.07,0.04,95,2002,C Major,4,groovy|classic|funk
+95,Play That Funky Music,Wild Cherry,funk,groovy,0.56,116,0.83,0.8,0.24,0.09,0.06,77,2010,G Major,4,groovy|classic|funk
+96,September,"Earth, Wind & Fire",funk,happy,0.71,115,0.68,0.66,0.22,0.05,0.08,84,2020,C Major,4,happy|classic|funk
+97,Uptown Funk,Mark Ronson ft. Bruno Mars,funk,energetic,0.54,101,0.36,0.83,0.29,0.01,0.05,77,2014,G Major,4,energetic|classic|funk
+98,Get Lucky,Daft Punk ft. Pharrell,disco,groovy,0.92,119,0.74,0.63,0.06,0.54,0.03,90,2004,F# Minor,4,groovy|classic|disco
+99,Fly Me to the Moon,Frank Sinatra,jazz,romantic,0.56,76,0.23,0.57,0.98,0.27,0.04,75,1966,Eb Major,4,romantic|classic|jazz
+100,Feeling Good,Nina Simone,jazz,soulful,0.52,61,0.27,0.56,0.91,0.3,0.06,82,2016,G Major,4,soulful|classic|jazz

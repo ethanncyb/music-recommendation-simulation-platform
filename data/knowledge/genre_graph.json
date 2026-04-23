@@ -1,0 +1,260 @@
+{
+  "meta": {
+    "version": "1.0",
+    "generated_by": "manual/music-theory-review",
+    "generated_at": "2026-04-15T00:00:00Z",
+    "description": "Genre similarity scores (0.0-1.0)",
+    "item_count": 27
+  },
+  "items": [
+    "amapiano", "ambient", "bossa nova", "classical", "country", "disco",
+    "edm", "folk", "funk", "grunge", "hip-hop", "indie pop", "jazz",
+    "k-pop", "latin rock", "lofi", "metal", "pop", "r&b", "reggae",
+    "rock", "rockabilly", "salsa", "ska", "synth-pop", "synthwave", "trap"
+  ],
+  "similarities": {
+    "amapiano": {
+      "amapiano": 1.0, "ambient": 0.1, "bossa nova": 0.15, "classical": 0.05,
+      "country": 0.05, "disco": 0.35, "edm": 0.55, "folk": 0.05, "funk": 0.3,
+      "grunge": 0.0, "hip-hop": 0.4, "indie pop": 0.2, "jazz": 0.15,
+      "k-pop": 0.3, "latin rock": 0.15, "lofi": 0.2, "metal": 0.0,
+      "pop": 0.35, "r&b": 0.45, "reggae": 0.25, "rock": 0.05,
+      "rockabilly": 0.05, "salsa": 0.2, "ska": 0.15, "synth-pop": 0.3,
+      "synthwave": 0.25, "trap": 0.4
+    },
+    "ambient": {
+      "amapiano": 0.1, "ambient": 1.0, "bossa nova": 0.25, "classical": 0.4,
+      "country": 0.05, "disco": 0.0, "edm": 0.3, "folk": 0.15, "funk": 0.0,
+      "grunge": 0.0, "hip-hop": 0.05, "indie pop": 0.15, "jazz": 0.25,
+      "k-pop": 0.05, "latin rock": 0.0, "lofi": 0.7, "metal": 0.0,
+      "pop": 0.05, "r&b": 0.1, "reggae": 0.1, "rock": 0.0,
+      "rockabilly": 0.0, "salsa": 0.0, "ska": 0.0, "synth-pop": 0.2,
+      "synthwave": 0.35, "trap": 0.05
+    },
+    "bossa nova": {
+      "amapiano": 0.15, "ambient": 0.25, "bossa nova": 1.0, "classical": 0.3,
+      "country": 0.15, "disco": 0.15, "edm": 0.05, "folk": 0.3, "funk": 0.2,
+      "grunge": 0.0, "hip-hop": 0.05, "indie pop": 0.2, "jazz": 0.75,
+      "k-pop": 0.05, "latin rock": 0.35, "lofi": 0.4, "metal": 0.0,
+      "pop": 0.2, "r&b": 0.3, "reggae": 0.25, "rock": 0.05,
+      "rockabilly": 0.05, "salsa": 0.4, "ska": 0.15, "synth-pop": 0.1,
+      "synthwave": 0.05, "trap": 0.05
+    },
+    "classical": {
+      "amapiano": 0.05, "ambient": 0.4, "bossa nova": 0.3, "classical": 1.0,
+      "country": 0.1, "disco": 0.0, "edm": 0.05, "folk": 0.25, "funk": 0.0,
+      "grunge": 0.0, "hip-hop": 0.0, "indie pop": 0.1, "jazz": 0.35,
+      "k-pop": 0.05, "latin rock": 0.1, "lofi": 0.2, "metal": 0.1,
+      "pop": 0.1, "r&b": 0.1, "reggae": 0.0, "rock": 0.1,
+      "rockabilly": 0.0, "salsa": 0.1, "ska": 0.0, "synth-pop": 0.1,
+      "synthwave": 0.15, "trap": 0.0
+    },
+    "country": {
+      "amapiano": 0.05, "ambient": 0.05, "bossa nova": 0.15, "classical": 0.1,
+      "country": 1.0, "disco": 0.1, "edm": 0.0, "folk": 0.75, "funk": 0.1,
+      "grunge": 0.1, "hip-hop": 0.1, "indie pop": 0.25, "jazz": 0.15,
+      "k-pop": 0.05, "latin rock": 0.2, "lofi": 0.05, "metal": 0.05,
+      "pop": 0.3, "r&b": 0.15, "reggae": 0.1, "rock": 0.4,
+      "rockabilly": 0.65, "salsa": 0.1, "ska": 0.1, "synth-pop": 0.1,
+      "synthwave": 0.05, "trap": 0.05
+    },
+    "disco": {
+      "amapiano": 0.35, "ambient": 0.0, "bossa nova": 0.15, "classical": 0.0,
+      "country": 0.1, "disco": 1.0, "edm": 0.55, "folk": 0.0, "funk": 0.75,
+      "grunge": 0.0, "hip-hop": 0.3, "indie pop": 0.25, "jazz": 0.15,
+      "k-pop": 0.35, "latin rock": 0.2, "lofi": 0.0, "metal": 0.0,
+      "pop": 0.55, "r&b": 0.5, "reggae": 0.2, "rock": 0.15,
+      "rockabilly": 0.15, "salsa": 0.35, "ska": 0.25, "synth-pop": 0.6,
+      "synthwave": 0.45, "trap": 0.2
+    },
+    "edm": {
+      "amapiano": 0.55, "ambient": 0.3, "bossa nova": 0.05, "classical": 0.05,
+      "country": 0.0, "disco": 0.55, "edm": 1.0, "folk": 0.0, "funk": 0.2,
+      "grunge": 0.05, "hip-hop": 0.35, "indie pop": 0.2, "jazz": 0.05,
+      "k-pop": 0.4, "latin rock": 0.1, "lofi": 0.15, "metal": 0.15,
+      "pop": 0.45, "r&b": 0.25, "reggae": 0.15, "rock": 0.15,
+      "rockabilly": 0.0, "salsa": 0.15, "ska": 0.1, "synth-pop": 0.65,
+      "synthwave": 0.7, "trap": 0.55
+    },
+    "folk": {
+      "amapiano": 0.05, "ambient": 0.15, "bossa nova": 0.3, "classical": 0.25,
+      "country": 0.75, "disco": 0.0, "edm": 0.0, "folk": 1.0, "funk": 0.05,
+      "grunge": 0.1, "hip-hop": 0.05, "indie pop": 0.4, "jazz": 0.2,
+      "k-pop": 0.0, "latin rock": 0.2, "lofi": 0.2, "metal": 0.05,
+      "pop": 0.2, "r&b": 0.1, "reggae": 0.15, "rock": 0.3,
+      "rockabilly": 0.3, "salsa": 0.1, "ska": 0.1, "synth-pop": 0.05,
+      "synthwave": 0.0, "trap": 0.0
+    },
+    "funk": {
+      "amapiano": 0.3, "ambient": 0.0, "bossa nova": 0.2, "classical": 0.0,
+      "country": 0.1, "disco": 0.75, "edm": 0.2, "folk": 0.05, "funk": 1.0,
+      "grunge": 0.1, "hip-hop": 0.45, "indie pop": 0.2, "jazz": 0.4,
+      "k-pop": 0.2, "latin rock": 0.25, "lofi": 0.1, "metal": 0.05,
+      "pop": 0.35, "r&b": 0.65, "reggae": 0.35, "rock": 0.3,
+      "rockabilly": 0.2, "salsa": 0.35, "ska": 0.4, "synth-pop": 0.3,
+      "synthwave": 0.2, "trap": 0.2
+    },
+    "grunge": {
+      "amapiano": 0.0, "ambient": 0.0, "bossa nova": 0.0, "classical": 0.0,
+      "country": 0.1, "disco": 0.0, "edm": 0.05, "folk": 0.1, "funk": 0.1,
+      "grunge": 1.0, "hip-hop": 0.1, "indie pop": 0.15, "jazz": 0.0,
+      "k-pop": 0.05, "latin rock": 0.3, "lofi": 0.05, "metal": 0.65,
+      "pop": 0.1, "r&b": 0.0, "reggae": 0.0, "rock": 0.8,
+      "rockabilly": 0.2, "salsa": 0.0, "ska": 0.1, "synth-pop": 0.05,
+      "synthwave": 0.05, "trap": 0.05
+    },
+    "hip-hop": {
+      "amapiano": 0.4, "ambient": 0.05, "bossa nova": 0.05, "classical": 0.0,
+      "country": 0.1, "disco": 0.3, "edm": 0.35, "folk": 0.05, "funk": 0.45,
+      "grunge": 0.1, "hip-hop": 1.0, "indie pop": 0.15, "jazz": 0.2,
+      "k-pop": 0.3, "latin rock": 0.1, "lofi": 0.3, "metal": 0.1,
+      "pop": 0.4, "r&b": 0.7, "reggae": 0.3, "rock": 0.15,
+      "rockabilly": 0.05, "salsa": 0.15, "ska": 0.15, "synth-pop": 0.25,
+      "synthwave": 0.15, "trap": 0.8
+    },
+    "indie pop": {
+      "amapiano": 0.2, "ambient": 0.15, "bossa nova": 0.2, "classical": 0.1,
+      "country": 0.25, "disco": 0.25, "edm": 0.2, "folk": 0.4, "funk": 0.2,
+      "grunge": 0.15, "hip-hop": 0.15, "indie pop": 1.0, "jazz": 0.15,
+      "k-pop": 0.3, "latin rock": 0.2, "lofi": 0.35, "metal": 0.05,
+      "pop": 0.7, "r&b": 0.25, "reggae": 0.15, "rock": 0.35,
+      "rockabilly": 0.2, "salsa": 0.1, "ska": 0.2, "synth-pop": 0.45,
+      "synthwave": 0.3, "trap": 0.1
+    },
+    "jazz": {
+      "amapiano": 0.15, "ambient": 0.25, "bossa nova": 0.75, "classical": 0.35,
+      "country": 0.15, "disco": 0.15, "edm": 0.05, "folk": 0.2, "funk": 0.4,
+      "grunge": 0.0, "hip-hop": 0.2, "indie pop": 0.15, "jazz": 1.0,
+      "k-pop": 0.05, "latin rock": 0.25, "lofi": 0.45, "metal": 0.0,
+      "pop": 0.15, "r&b": 0.4, "reggae": 0.2, "rock": 0.1,
+      "rockabilly": 0.1, "salsa": 0.35, "ska": 0.2, "synth-pop": 0.1,
+      "synthwave": 0.1, "trap": 0.1
+    },
+    "k-pop": {
+      "amapiano": 0.3, "ambient": 0.05, "bossa nova": 0.05, "classical": 0.05,
+      "country": 0.05, "disco": 0.35, "edm": 0.4, "folk": 0.0, "funk": 0.2,
+      "grunge": 0.05, "hip-hop": 0.3, "indie pop": 0.3, "jazz": 0.05,
+      "k-pop": 1.0, "latin rock": 0.1, "lofi": 0.1, "metal": 0.05,
+      "pop": 0.75, "r&b": 0.4, "reggae": 0.1, "rock": 0.15,
+      "rockabilly": 0.05, "salsa": 0.15, "ska": 0.1, "synth-pop": 0.5,
+      "synthwave": 0.3, "trap": 0.35
+    },
+    "latin rock": {
+      "amapiano": 0.15, "ambient": 0.0, "bossa nova": 0.35, "classical": 0.1,
+      "country": 0.2, "disco": 0.2, "edm": 0.1, "folk": 0.2, "funk": 0.25,
+      "grunge": 0.3, "hip-hop": 0.1, "indie pop": 0.2, "jazz": 0.25,
+      "k-pop": 0.1, "latin rock": 1.0, "lofi": 0.05, "metal": 0.3,
+      "pop": 0.2, "r&b": 0.15, "reggae": 0.25, "rock": 0.7,
+      "rockabilly": 0.3, "salsa": 0.55, "ska": 0.3, "synth-pop": 0.1,
+      "synthwave": 0.1, "trap": 0.1
+    },
+    "lofi": {
+      "amapiano": 0.2, "ambient": 0.7, "bossa nova": 0.4, "classical": 0.2,
+      "country": 0.05, "disco": 0.0, "edm": 0.15, "folk": 0.2, "funk": 0.1,
+      "grunge": 0.05, "hip-hop": 0.3, "indie pop": 0.35, "jazz": 0.45,
+      "k-pop": 0.1, "latin rock": 0.05, "lofi": 1.0, "metal": 0.0,
+      "pop": 0.15, "r&b": 0.25, "reggae": 0.15, "rock": 0.05,
+      "rockabilly": 0.0, "salsa": 0.05, "ska": 0.05, "synth-pop": 0.2,
+      "synthwave": 0.3, "trap": 0.2
+    },
+    "metal": {
+      "amapiano": 0.0, "ambient": 0.0, "bossa nova": 0.0, "classical": 0.1,
+      "country": 0.05, "disco": 0.0, "edm": 0.15, "folk": 0.05, "funk": 0.05,
+      "grunge": 0.65, "hip-hop": 0.1, "indie pop": 0.05, "jazz": 0.0,
+      "k-pop": 0.05, "latin rock": 0.3, "lofi": 0.0, "metal": 1.0,
+      "pop": 0.05, "r&b": 0.0, "reggae": 0.0, "rock": 0.7,
+      "rockabilly": 0.15, "salsa": 0.0, "ska": 0.05, "synth-pop": 0.05,
+      "synthwave": 0.1, "trap": 0.1
+    },
+    "pop": {
+      "amapiano": 0.35, "ambient": 0.05, "bossa nova": 0.2, "classical": 0.1,
+      "country": 0.3, "disco": 0.55, "edm": 0.45, "folk": 0.2, "funk": 0.35,
+      "grunge": 0.1, "hip-hop": 0.4, "indie pop": 0.7, "jazz": 0.15,
+      "k-pop": 0.75, "latin rock": 0.2, "lofi": 0.15, "metal": 0.05,
+      "pop": 1.0, "r&b": 0.5, "reggae": 0.2, "rock": 0.35,
+      "rockabilly": 0.2, "salsa": 0.2, "ska": 0.2, "synth-pop": 0.7,
+      "synthwave": 0.4, "trap": 0.35
+    },
+    "r&b": {
+      "amapiano": 0.45, "ambient": 0.1, "bossa nova": 0.3, "classical": 0.1,
+      "country": 0.15, "disco": 0.5, "edm": 0.25, "folk": 0.1, "funk": 0.65,
+      "grunge": 0.0, "hip-hop": 0.7, "indie pop": 0.25, "jazz": 0.4,
+      "k-pop": 0.4, "latin rock": 0.15, "lofi": 0.25, "metal": 0.0,
+      "pop": 0.5, "r&b": 1.0, "reggae": 0.3, "rock": 0.1,
+      "rockabilly": 0.1, "salsa": 0.25, "ska": 0.15, "synth-pop": 0.35,
+      "synthwave": 0.2, "trap": 0.5
+    },
+    "reggae": {
+      "amapiano": 0.25, "ambient": 0.1, "bossa nova": 0.25, "classical": 0.0,
+      "country": 0.1, "disco": 0.2, "edm": 0.15, "folk": 0.15, "funk": 0.35,
+      "grunge": 0.0, "hip-hop": 0.3, "indie pop": 0.15, "jazz": 0.2,
+      "k-pop": 0.1, "latin rock": 0.25, "lofi": 0.15, "metal": 0.0,
+      "pop": 0.2, "r&b": 0.3, "reggae": 1.0, "rock": 0.15,
+      "rockabilly": 0.1, "salsa": 0.3, "ska": 0.7, "synth-pop": 0.1,
+      "synthwave": 0.1, "trap": 0.2
+    },
+    "rock": {
+      "amapiano": 0.05, "ambient": 0.0, "bossa nova": 0.05, "classical": 0.1,
+      "country": 0.4, "disco": 0.15, "edm": 0.15, "folk": 0.3, "funk": 0.3,
+      "grunge": 0.8, "hip-hop": 0.15, "indie pop": 0.35, "jazz": 0.1,
+      "k-pop": 0.15, "latin rock": 0.7, "lofi": 0.05, "metal": 0.7,
+      "pop": 0.35, "r&b": 0.1, "reggae": 0.15, "rock": 1.0,
+      "rockabilly": 0.6, "salsa": 0.1, "ska": 0.2, "synth-pop": 0.2,
+      "synthwave": 0.2, "trap": 0.05
+    },
+    "rockabilly": {
+      "amapiano": 0.05, "ambient": 0.0, "bossa nova": 0.05, "classical": 0.0,
+      "country": 0.65, "disco": 0.15, "edm": 0.0, "folk": 0.3, "funk": 0.2,
+      "grunge": 0.2, "hip-hop": 0.05, "indie pop": 0.2, "jazz": 0.1,
+      "k-pop": 0.05, "latin rock": 0.3, "lofi": 0.0, "metal": 0.15,
+      "pop": 0.2, "r&b": 0.1, "reggae": 0.1, "rock": 0.6,
+      "rockabilly": 1.0, "salsa": 0.1, "ska": 0.2, "synth-pop": 0.1,
+      "synthwave": 0.05, "trap": 0.0
+    },
+    "salsa": {
+      "amapiano": 0.2, "ambient": 0.0, "bossa nova": 0.4, "classical": 0.1,
+      "country": 0.1, "disco": 0.35, "edm": 0.15, "folk": 0.1, "funk": 0.35,
+      "grunge": 0.0, "hip-hop": 0.15, "indie pop": 0.1, "jazz": 0.35,
+      "k-pop": 0.15, "latin rock": 0.55, "lofi": 0.05, "metal": 0.0,
+      "pop": 0.2, "r&b": 0.25, "reggae": 0.3, "rock": 0.1,
+      "rockabilly": 0.1, "salsa": 1.0, "ska": 0.3, "synth-pop": 0.1,
+      "synthwave": 0.05, "trap": 0.1
+    },
+    "ska": {
+      "amapiano": 0.15, "ambient": 0.0, "bossa nova": 0.15, "classical": 0.0,
+      "country": 0.1, "disco": 0.25, "edm": 0.1, "folk": 0.1, "funk": 0.4,
+      "grunge": 0.1, "hip-hop": 0.15, "indie pop": 0.2, "jazz": 0.2,
+      "k-pop": 0.1, "latin rock": 0.3, "lofi": 0.05, "metal": 0.05,
+      "pop": 0.2, "r&b": 0.15, "reggae": 0.7, "rock": 0.2,
+      "rockabilly": 0.2, "salsa": 0.3, "ska": 1.0, "synth-pop": 0.1,
+      "synthwave": 0.05, "trap": 0.1
+    },
+    "synth-pop": {
+      "amapiano": 0.3, "ambient": 0.2, "bossa nova": 0.1, "classical": 0.1,
+      "country": 0.1, "disco": 0.6, "edm": 0.65, "folk": 0.05, "funk": 0.3,
+      "grunge": 0.05, "hip-hop": 0.25, "indie pop": 0.45, "jazz": 0.1,
+      "k-pop": 0.5, "latin rock": 0.1, "lofi": 0.2, "metal": 0.05,
+      "pop": 0.7, "r&b": 0.35, "reggae": 0.1, "rock": 0.2,
+      "rockabilly": 0.1, "salsa": 0.1, "ska": 0.1, "synth-pop": 1.0,
+      "synthwave": 0.8, "trap": 0.3
+    },
+    "synthwave": {
+      "amapiano": 0.25, "ambient": 0.35, "bossa nova": 0.05, "classical": 0.15,
+      "country": 0.05, "disco": 0.45, "edm": 0.7, "folk": 0.0, "funk": 0.2,
+      "grunge": 0.05, "hip-hop": 0.15, "indie pop": 0.3, "jazz": 0.1,
+      "k-pop": 0.3, "latin rock": 0.1, "lofi": 0.3, "metal": 0.1,
+      "pop": 0.4, "r&b": 0.2, "reggae": 0.1, "rock": 0.2,
+      "rockabilly": 0.05, "salsa": 0.05, "ska": 0.05, "synth-pop": 0.8,
+      "synthwave": 1.0, "trap": 0.25
+    },
+    "trap": {
+      "amapiano": 0.4, "ambient": 0.05, "bossa nova": 0.05, "classical": 0.0,
+      "country": 0.05, "disco": 0.2, "edm": 0.55, "folk": 0.0, "funk": 0.2,
+      "grunge": 0.05, "hip-hop": 0.8, "indie pop": 0.1, "jazz": 0.1,
+      "k-pop": 0.35, "latin rock": 0.1, "lofi": 0.2, "metal": 0.1,
+      "pop": 0.35, "r&b": 0.5, "reggae": 0.2, "rock": 0.05,
+      "rockabilly": 0.0, "salsa": 0.1, "ska": 0.1, "synth-pop": 0.3,
+      "synthwave": 0.25, "trap": 1.0
+    }
+  }
+}

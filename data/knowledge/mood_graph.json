@@ -1,0 +1,217 @@
+{
+  "meta": {
+    "version": "1.0",
+    "generated_by": "manual/music-theory-review",
+    "generated_at": "2026-04-15T00:00:00Z",
+    "description": "Mood similarity scores (0.0-1.0)",
+    "item_count": 25
+  },
+  "items": [
+    "angry", "brooding", "chill", "confident", "dreamy", "energetic",
+    "euphoric", "festive", "fierce", "focused", "groovy", "happy",
+    "intense", "laid-back", "moody", "nostalgic", "peaceful", "rebellious",
+    "reflective", "relaxed", "romantic", "sad", "sensual", "steadfast", "upbeat"
+  ],
+  "similarities": {
+    "angry": {
+      "angry": 1.0, "brooding": 0.55, "chill": 0.0, "confident": 0.3,
+      "dreamy": 0.0, "energetic": 0.5, "euphoric": 0.1, "festive": 0.05,
+      "fierce": 0.8, "focused": 0.2, "groovy": 0.05, "happy": 0.0,
+      "intense": 0.85, "laid-back": 0.0, "moody": 0.45, "nostalgic": 0.05,
+      "peaceful": 0.0, "rebellious": 0.75, "reflective": 0.1, "relaxed": 0.0,
+      "romantic": 0.0, "sad": 0.3, "sensual": 0.0, "steadfast": 0.3, "upbeat": 0.05
+    },
+    "brooding": {
+      "angry": 0.55, "brooding": 1.0, "chill": 0.15, "confident": 0.15,
+      "dreamy": 0.3, "energetic": 0.1, "euphoric": 0.0, "festive": 0.0,
+      "fierce": 0.4, "focused": 0.25, "groovy": 0.05, "happy": 0.0,
+      "intense": 0.5, "laid-back": 0.1, "moody": 0.8, "nostalgic": 0.4,
+      "peaceful": 0.1, "rebellious": 0.4, "reflective": 0.6, "relaxed": 0.1,
+      "romantic": 0.15, "sad": 0.6, "sensual": 0.15, "steadfast": 0.2, "upbeat": 0.0
+    },
+    "chill": {
+      "angry": 0.0, "brooding": 0.15, "chill": 1.0, "confident": 0.1,
+      "dreamy": 0.6, "energetic": 0.0, "euphoric": 0.1, "festive": 0.1,
+      "fierce": 0.0, "focused": 0.55, "groovy": 0.3, "happy": 0.3,
+      "intense": 0.0, "laid-back": 0.8, "moody": 0.2, "nostalgic": 0.35,
+      "peaceful": 0.75, "rebellious": 0.0, "reflective": 0.4, "relaxed": 0.85,
+      "romantic": 0.3, "sad": 0.15, "sensual": 0.3, "steadfast": 0.15, "upbeat": 0.15
+    },
+    "confident": {
+      "angry": 0.3, "brooding": 0.15, "chill": 0.1, "confident": 1.0,
+      "dreamy": 0.05, "energetic": 0.6, "euphoric": 0.4, "festive": 0.35,
+      "fierce": 0.6, "focused": 0.35, "groovy": 0.4, "happy": 0.4,
+      "intense": 0.4, "laid-back": 0.1, "moody": 0.1, "nostalgic": 0.05,
+      "peaceful": 0.0, "rebellious": 0.5, "reflective": 0.1, "relaxed": 0.05,
+      "romantic": 0.1, "sad": 0.0, "sensual": 0.2, "steadfast": 0.6, "upbeat": 0.55
+    },
+    "dreamy": {
+      "angry": 0.0, "brooding": 0.3, "chill": 0.6, "confident": 0.05,
+      "dreamy": 1.0, "energetic": 0.0, "euphoric": 0.25, "festive": 0.05,
+      "fierce": 0.0, "focused": 0.2, "groovy": 0.1, "happy": 0.2,
+      "intense": 0.0, "laid-back": 0.5, "moody": 0.45, "nostalgic": 0.55,
+      "peaceful": 0.65, "rebellious": 0.0, "reflective": 0.55, "relaxed": 0.6,
+      "romantic": 0.55, "sad": 0.3, "sensual": 0.4, "steadfast": 0.05, "upbeat": 0.05
+    },
+    "energetic": {
+      "angry": 0.5, "brooding": 0.1, "chill": 0.0, "confident": 0.6,
+      "dreamy": 0.0, "energetic": 1.0, "euphoric": 0.7, "festive": 0.65,
+      "fierce": 0.7, "focused": 0.3, "groovy": 0.5, "happy": 0.6,
+      "intense": 0.75, "laid-back": 0.0, "moody": 0.05, "nostalgic": 0.0,
+      "peaceful": 0.0, "rebellious": 0.55, "reflective": 0.0, "relaxed": 0.0,
+      "romantic": 0.05, "sad": 0.0, "sensual": 0.1, "steadfast": 0.4, "upbeat": 0.8
+    },
+    "euphoric": {
+      "angry": 0.1, "brooding": 0.0, "chill": 0.1, "confident": 0.4,
+      "dreamy": 0.25, "energetic": 0.7, "euphoric": 1.0, "festive": 0.6,
+      "fierce": 0.3, "focused": 0.15, "groovy": 0.4, "happy": 0.75,
+      "intense": 0.45, "laid-back": 0.05, "moody": 0.0, "nostalgic": 0.15,
+      "peaceful": 0.1, "rebellious": 0.2, "reflective": 0.1, "relaxed": 0.1,
+      "romantic": 0.25, "sad": 0.0, "sensual": 0.2, "steadfast": 0.2, "upbeat": 0.75
+    },
+    "festive": {
+      "angry": 0.05, "brooding": 0.0, "chill": 0.1, "confident": 0.35,
+      "dreamy": 0.05, "energetic": 0.65, "euphoric": 0.6, "festive": 1.0,
+      "fierce": 0.15, "focused": 0.05, "groovy": 0.55, "happy": 0.7,
+      "intense": 0.2, "laid-back": 0.15, "moody": 0.0, "nostalgic": 0.2,
+      "peaceful": 0.1, "rebellious": 0.1, "reflective": 0.05, "relaxed": 0.15,
+      "romantic": 0.15, "sad": 0.0, "sensual": 0.15, "steadfast": 0.2, "upbeat": 0.8
+    },
+    "fierce": {
+      "angry": 0.8, "brooding": 0.4, "chill": 0.0, "confident": 0.6,
+      "dreamy": 0.0, "energetic": 0.7, "euphoric": 0.3, "festive": 0.15,
+      "fierce": 1.0, "focused": 0.3, "groovy": 0.1, "happy": 0.05,
+      "intense": 0.8, "laid-back": 0.0, "moody": 0.3, "nostalgic": 0.0,
+      "peaceful": 0.0, "rebellious": 0.7, "reflective": 0.05, "relaxed": 0.0,
+      "romantic": 0.0, "sad": 0.1, "sensual": 0.1, "steadfast": 0.4, "upbeat": 0.15
+    },
+    "focused": {
+      "angry": 0.2, "brooding": 0.25, "chill": 0.55, "confident": 0.35,
+      "dreamy": 0.2, "energetic": 0.3, "euphoric": 0.15, "festive": 0.05,
+      "fierce": 0.3, "focused": 1.0, "groovy": 0.2, "happy": 0.1,
+      "intense": 0.4, "laid-back": 0.25, "moody": 0.3, "nostalgic": 0.1,
+      "peaceful": 0.3, "rebellious": 0.15, "reflective": 0.4, "relaxed": 0.3,
+      "romantic": 0.05, "sad": 0.1, "sensual": 0.05, "steadfast": 0.5, "upbeat": 0.1
+    },
+    "groovy": {
+      "angry": 0.05, "brooding": 0.05, "chill": 0.3, "confident": 0.4,
+      "dreamy": 0.1, "energetic": 0.5, "euphoric": 0.4, "festive": 0.55,
+      "fierce": 0.1, "focused": 0.2, "groovy": 1.0, "happy": 0.55,
+      "intense": 0.15, "laid-back": 0.4, "moody": 0.1, "nostalgic": 0.2,
+      "peaceful": 0.1, "rebellious": 0.1, "reflective": 0.05, "relaxed": 0.3,
+      "romantic": 0.2, "sad": 0.0, "sensual": 0.35, "steadfast": 0.25, "upbeat": 0.7
+    },
+    "happy": {
+      "angry": 0.0, "brooding": 0.0, "chill": 0.3, "confident": 0.4,
+      "dreamy": 0.2, "energetic": 0.6, "euphoric": 0.75, "festive": 0.7,
+      "fierce": 0.05, "focused": 0.1, "groovy": 0.55, "happy": 1.0,
+      "intense": 0.1, "laid-back": 0.25, "moody": 0.0, "nostalgic": 0.2,
+      "peaceful": 0.3, "rebellious": 0.05, "reflective": 0.1, "relaxed": 0.3,
+      "romantic": 0.35, "sad": 0.0, "sensual": 0.2, "steadfast": 0.25, "upbeat": 0.85
+    },
+    "intense": {
+      "angry": 0.85, "brooding": 0.5, "chill": 0.0, "confident": 0.4,
+      "dreamy": 0.0, "energetic": 0.75, "euphoric": 0.45, "festive": 0.2,
+      "fierce": 0.8, "focused": 0.4, "groovy": 0.15, "happy": 0.1,
+      "intense": 1.0, "laid-back": 0.0, "moody": 0.4, "nostalgic": 0.05,
+      "peaceful": 0.0, "rebellious": 0.65, "reflective": 0.15, "relaxed": 0.0,
+      "romantic": 0.05, "sad": 0.2, "sensual": 0.1, "steadfast": 0.35, "upbeat": 0.2
+    },
+    "laid-back": {
+      "angry": 0.0, "brooding": 0.1, "chill": 0.8, "confident": 0.1,
+      "dreamy": 0.5, "energetic": 0.0, "euphoric": 0.05, "festive": 0.15,
+      "fierce": 0.0, "focused": 0.25, "groovy": 0.4, "happy": 0.25,
+      "intense": 0.0, "laid-back": 1.0, "moody": 0.15, "nostalgic": 0.35,
+      "peaceful": 0.65, "rebellious": 0.0, "reflective": 0.35, "relaxed": 0.8,
+      "romantic": 0.25, "sad": 0.1, "sensual": 0.3, "steadfast": 0.15, "upbeat": 0.15
+    },
+    "moody": {
+      "angry": 0.45, "brooding": 0.8, "chill": 0.2, "confident": 0.1,
+      "dreamy": 0.45, "energetic": 0.05, "euphoric": 0.0, "festive": 0.0,
+      "fierce": 0.3, "focused": 0.3, "groovy": 0.1, "happy": 0.0,
+      "intense": 0.4, "laid-back": 0.15, "moody": 1.0, "nostalgic": 0.5,
+      "peaceful": 0.1, "rebellious": 0.35, "reflective": 0.6, "relaxed": 0.15,
+      "romantic": 0.25, "sad": 0.6, "sensual": 0.25, "steadfast": 0.15, "upbeat": 0.0
+    },
+    "nostalgic": {
+      "angry": 0.05, "brooding": 0.4, "chill": 0.35, "confident": 0.05,
+      "dreamy": 0.55, "energetic": 0.0, "euphoric": 0.15, "festive": 0.2,
+      "fierce": 0.0, "focused": 0.1, "groovy": 0.2, "happy": 0.2,
+      "intense": 0.05, "laid-back": 0.35, "moody": 0.5, "nostalgic": 1.0,
+      "peaceful": 0.3, "rebellious": 0.05, "reflective": 0.7, "relaxed": 0.3,
+      "romantic": 0.45, "sad": 0.55, "sensual": 0.2, "steadfast": 0.2, "upbeat": 0.1
+    },
+    "peaceful": {
+      "angry": 0.0, "brooding": 0.1, "chill": 0.75, "confident": 0.0,
+      "dreamy": 0.65, "energetic": 0.0, "euphoric": 0.1, "festive": 0.1,
+      "fierce": 0.0, "focused": 0.3, "groovy": 0.1, "happy": 0.3,
+      "intense": 0.0, "laid-back": 0.65, "moody": 0.1, "nostalgic": 0.3,
+      "peaceful": 1.0, "rebellious": 0.0, "reflective": 0.5, "relaxed": 0.8,
+      "romantic": 0.35, "sad": 0.2, "sensual": 0.2, "steadfast": 0.15, "upbeat": 0.1
+    },
+    "rebellious": {
+      "angry": 0.75, "brooding": 0.4, "chill": 0.0, "confident": 0.5,
+      "dreamy": 0.0, "energetic": 0.55, "euphoric": 0.2, "festive": 0.1,
+      "fierce": 0.7, "focused": 0.15, "groovy": 0.1, "happy": 0.05,
+      "intense": 0.65, "laid-back": 0.0, "moody": 0.35, "nostalgic": 0.05,
+      "peaceful": 0.0, "rebellious": 1.0, "reflective": 0.1, "relaxed": 0.0,
+      "romantic": 0.0, "sad": 0.15, "sensual": 0.05, "steadfast": 0.35, "upbeat": 0.1
+    },
+    "reflective": {
+      "angry": 0.1, "brooding": 0.6, "chill": 0.4, "confident": 0.1,
+      "dreamy": 0.55, "energetic": 0.0, "euphoric": 0.1, "festive": 0.05,
+      "fierce": 0.05, "focused": 0.4, "groovy": 0.05, "happy": 0.1,
+      "intense": 0.15, "laid-back": 0.35, "moody": 0.6, "nostalgic": 0.7,
+      "peaceful": 0.5, "rebellious": 0.1, "reflective": 1.0, "relaxed": 0.4,
+      "romantic": 0.3, "sad": 0.55, "sensual": 0.15, "steadfast": 0.25, "upbeat": 0.0
+    },
+    "relaxed": {
+      "angry": 0.0, "brooding": 0.1, "chill": 0.85, "confident": 0.05,
+      "dreamy": 0.6, "energetic": 0.0, "euphoric": 0.1, "festive": 0.15,
+      "fierce": 0.0, "focused": 0.3, "groovy": 0.3, "happy": 0.3,
+      "intense": 0.0, "laid-back": 0.8, "moody": 0.15, "nostalgic": 0.3,
+      "peaceful": 0.8, "rebellious": 0.0, "reflective": 0.4, "relaxed": 1.0,
+      "romantic": 0.35, "sad": 0.15, "sensual": 0.35, "steadfast": 0.1, "upbeat": 0.15
+    },
+    "romantic": {
+      "angry": 0.0, "brooding": 0.15, "chill": 0.3, "confident": 0.1,
+      "dreamy": 0.55, "energetic": 0.05, "euphoric": 0.25, "festive": 0.15,
+      "fierce": 0.0, "focused": 0.05, "groovy": 0.2, "happy": 0.35,
+      "intense": 0.05, "laid-back": 0.25, "moody": 0.25, "nostalgic": 0.45,
+      "peaceful": 0.35, "rebellious": 0.0, "reflective": 0.3, "relaxed": 0.35,
+      "romantic": 1.0, "sad": 0.3, "sensual": 0.75, "steadfast": 0.15, "upbeat": 0.15
+    },
+    "sad": {
+      "angry": 0.3, "brooding": 0.6, "chill": 0.15, "confident": 0.0,
+      "dreamy": 0.3, "energetic": 0.0, "euphoric": 0.0, "festive": 0.0,
+      "fierce": 0.1, "focused": 0.1, "groovy": 0.0, "happy": 0.0,
+      "intense": 0.2, "laid-back": 0.1, "moody": 0.6, "nostalgic": 0.55,
+      "peaceful": 0.2, "rebellious": 0.15, "reflective": 0.55, "relaxed": 0.15,
+      "romantic": 0.3, "sad": 1.0, "sensual": 0.1, "steadfast": 0.1, "upbeat": 0.0
+    },
+    "sensual": {
+      "angry": 0.0, "brooding": 0.15, "chill": 0.3, "confident": 0.2,
+      "dreamy": 0.4, "energetic": 0.1, "euphoric": 0.2, "festive": 0.15,
+      "fierce": 0.1, "focused": 0.05, "groovy": 0.35, "happy": 0.2,
+      "intense": 0.1, "laid-back": 0.3, "moody": 0.25, "nostalgic": 0.2,
+      "peaceful": 0.2, "rebellious": 0.05, "reflective": 0.15, "relaxed": 0.35,
+      "romantic": 0.75, "sad": 0.1, "sensual": 1.0, "steadfast": 0.05, "upbeat": 0.15
+    },
+    "steadfast": {
+      "angry": 0.3, "brooding": 0.2, "chill": 0.15, "confident": 0.6,
+      "dreamy": 0.05, "energetic": 0.4, "euphoric": 0.2, "festive": 0.2,
+      "fierce": 0.4, "focused": 0.5, "groovy": 0.25, "happy": 0.25,
+      "intense": 0.35, "laid-back": 0.15, "moody": 0.15, "nostalgic": 0.2,
+      "peaceful": 0.15, "rebellious": 0.35, "reflective": 0.25, "relaxed": 0.1,
+      "romantic": 0.15, "sad": 0.1, "sensual": 0.05, "steadfast": 1.0, "upbeat": 0.3
+    },
+    "upbeat": {
+      "angry": 0.05, "brooding": 0.0, "chill": 0.15, "confident": 0.55,
+      "dreamy": 0.05, "energetic": 0.8, "euphoric": 0.75, "festive": 0.8,
+      "fierce": 0.15, "focused": 0.1, "groovy": 0.7, "happy": 0.85,
+      "intense": 0.2, "laid-back": 0.15, "moody": 0.0, "nostalgic": 0.1,
+      "peaceful": 0.1, "rebellious": 0.1, "reflective": 0.0, "relaxed": 0.15,
+      "romantic": 0.15, "sad": 0.0, "sensual": 0.15, "steadfast": 0.3, "upbeat": 1.0
+    }
+  }
+}
