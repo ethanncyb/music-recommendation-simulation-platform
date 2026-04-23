@@ -1,5 +1,6 @@
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple, Optional, Any
 from dataclasses import dataclass
+import json
 
 @dataclass
 class Song:
@@ -125,33 +126,35 @@ class Recommender:
         _, reasons = score_song(user_prefs, song.__dict__, self.strategy, self.knowledge)
         return "; ".join(reasons)
 
-def load_songs(csv_path: str) -> List[Dict]:
-    """Reads songs from a CSV file and returns a list of dicts with typed fields."""
-    import csv
-    songs = []
-    with open(csv_path, newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            songs.append({
-                "id":               int(row["id"]),
-                "title":            row["title"],
-                "artist":           row["artist"],
-                "genre":            row["genre"],
-                "mood":             row["mood"],
-                "energy":           float(row["energy"]),
-                "tempo_bpm":        float(row["tempo_bpm"]),
-                "valence":          float(row["valence"]),
-                "danceability":     float(row["danceability"]),
-                "acousticness":     float(row["acousticness"]),
-                "instrumentalness": float(row["instrumentalness"]),
-                "speechiness":      float(row["speechiness"]),
-                # Advanced features
-                "popularity":       int(row["popularity"]),
-                "release_year":     int(row["release_year"]),
-                "key_signature":    row["key_signature"],
-                "time_signature":   int(row["time_signature"]),
-                "detailed_moods":   row["detailed_moods"],
-            })
+def _song_from_record(record: Dict[str, Any]) -> Dict[str, Any]:
+    """Coerce a song record into the expected typed shape."""
+    return {
+        "id": int(record["id"]),
+        "title": record["title"],
+        "artist": record["artist"],
+        "genre": record["genre"],
+        "mood": record["mood"],
+        "energy": float(record["energy"]),
+        "tempo_bpm": float(record["tempo_bpm"]),
+        "valence": float(record["valence"]),
+        "danceability": float(record["danceability"]),
+        "acousticness": float(record["acousticness"]),
+        "instrumentalness": float(record["instrumentalness"]),
+        "speechiness": float(record["speechiness"]),
+        # Advanced features
+        "popularity": int(record["popularity"]),
+        "release_year": int(record["release_year"]),
+        "key_signature": record["key_signature"],
+        "time_signature": int(record["time_signature"]),
+        "detailed_moods": record["detailed_moods"],
+    }
+
+
+def load_songs(json_path: str) -> List[Dict]:
+    """Reads songs from a JSON file and returns typed song dicts."""
+    with open(json_path, encoding="utf-8") as f:
+        rows = json.load(f)
+    songs = [_song_from_record(row) for row in rows]
     print(f"Loaded songs: {len(songs)}")
     return songs
 

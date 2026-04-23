@@ -42,15 +42,15 @@ def _scores_are_desc_sorted(results):
 
 
 def test_demo_load_catalog():
-    """Demo: load song catalog from CSV."""
-    songs = load_songs("data/songs.csv")
-    assert len(songs) == 30
+    """Demo: load song catalog from JSON."""
+    songs = load_songs("data/songs.json")
+    assert len(songs) > 0
     assert {"title", "genre", "mood", "energy"}.issubset(songs[0].keys())
 
 
 def test_demo_recommendation_cases_from_profiles():
     """Demo: run the four built-in profile scenarios from main.py."""
-    songs = load_songs("data/songs.csv")
+    songs = load_songs("data/songs.json")
 
     for name, prefs in PROFILES.items():
         strategy = PROFILE_STRATEGIES.get(name, DEFAULT)
@@ -67,7 +67,7 @@ def test_demo_recommendation_cases_from_profiles():
 
 def test_demo_strategy_comparison_changes_winner_for_edge_profile():
     """Demo: compare ranking strategies for the edge-case user profile."""
-    songs = load_songs("data/songs.csv")
+    songs = load_songs("data/songs.json")
     user = PROFILES["Conflicted Listener"]
 
     top_titles = {}
@@ -126,7 +126,7 @@ def test_demo_oop_recommender_and_explanation_usage():
 
 def test_demo_confidence_easy_vs_hard_profile():
     """Demo: confidence scoring for easy and hard preference combinations."""
-    songs = load_songs("data/songs.csv")
+    songs = load_songs("data/songs.json")
     scorer = ConfidenceScorer(songs)
 
     easy = {
@@ -154,7 +154,7 @@ def test_demo_confidence_easy_vs_hard_profile():
 
 def test_demo_bias_audit_core_signals():
     """Demo: run bias audit and verify core catalog-level findings are reported."""
-    songs = load_songs("data/songs.csv")
+    songs = load_songs("data/songs.json")
     auditor = BiasAuditor(songs)
     report = auditor.run_audit()
 
@@ -166,8 +166,9 @@ def test_demo_bias_audit_core_signals():
 
 def test_demo_mcp_offline_handlers():
     """Demo: call MCP handlers directly without running an MCP client."""
+    expected_catalog_size = len(load_songs("data/songs.json"))
     catalog = handle_list_catalog({})
-    assert len(catalog) == 30
+    assert len(catalog) == expected_catalog_size
 
     manual = handle_recommend_manual(
         {

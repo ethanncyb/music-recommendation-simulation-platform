@@ -8,7 +8,7 @@ Supports two backends:
 Usage:
     from src.llm_provider import get_provider
 
-    llm = get_provider("ollama", model="llama3.1:8b")
+    llm = get_provider("ollama", model="llama3.2")
     response = llm.generate("Say hello")
 
     llm = get_provider("anthropic")
@@ -19,6 +19,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 import json
 import os
+from .env_config import load_dotenv
 
 
 class LLMProvider(ABC):
@@ -49,10 +50,11 @@ class LLMProvider(ABC):
 class OllamaProvider(LLMProvider):
     """Local LLM via Ollama (default provider)."""
 
-    def __init__(self, model: str = "llama3.1:8b",
-                 base_url: str = "http://localhost:11434"):
-        self.model = model
-        self.base_url = base_url.rstrip("/")
+    def __init__(self, model: Optional[str] = None,
+                 base_url: Optional[str] = None):
+        load_dotenv()
+        self.model = model or os.getenv("OLLAMA_MODEL", "llama3.2")
+        self.base_url = (base_url or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")).rstrip("/")
         self._check_connection()
 
     def _check_connection(self):
@@ -123,6 +125,7 @@ def get_provider(backend: str = "ollama", **kwargs) -> LLMProvider:
         backend: "ollama" (default) or "anthropic"
         **kwargs: passed to the provider constructor (e.g., model, base_url)
     """
+    load_dotenv()
     if backend == "ollama":
         return OllamaProvider(**kwargs)
     elif backend == "anthropic":

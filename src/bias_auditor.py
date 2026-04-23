@@ -8,7 +8,7 @@ Usage:
     from src.bias_auditor import BiasAuditor
     from src.recommender import load_songs, DEFAULT
 
-    songs = load_songs("data/songs.csv")
+    songs = load_songs("data/songs.json")
     auditor = BiasAuditor(songs, strategy=DEFAULT)
     report = auditor.run_audit()
     auditor.print_report(report)

@@ -1,5 +1,7 @@
 """Tests for the bias auditor and evaluation metrics."""
 
+from collections import Counter
+
 from src.recommender import load_songs, recommend_songs, DEFAULT
 from src.bias_auditor import BiasAuditor, BiasSignature, AuditReport
 from src.metrics import (
@@ -114,7 +116,7 @@ def test_empty_results():
 # ── Bias Auditor tests ───────────────────────────────────────────────────
 
 def _load_auditor():
-    songs = load_songs("data/songs.csv")
+    songs = load_songs("data/songs.json")
     return BiasAuditor(songs, strategy=DEFAULT), songs
 
 
@@ -127,12 +129,13 @@ def test_generate_audit_profiles_count():
 
 
 def test_genre_lockout_detected():
-    auditor, _ = _load_auditor()
+    auditor, songs = _load_auditor()
     biases = auditor._detect_genre_lockout()
+    expected_locked_genres = sum(1 for count in Counter(s["genre"] for s in songs).values() if count == 1)
     assert len(biases) == 1
     assert biases[0].name == "genre_lockout"
     assert biases[0].severity == "high"
-    assert biases[0].affected_count >= 20  # most genres have only 1 song
+    assert biases[0].affected_count == expected_locked_genres
 
 
 def test_mood_desert_detected():
@@ -156,7 +159,7 @@ def test_run_audit_returns_valid_report():
     assert isinstance(report, AuditReport)
     assert report.strategy_name == "Default"
     assert report.profiles_tested >= 162
-    assert report.songs_in_catalog == 30
+    assert report.songs_in_catalog == len(songs)
     assert len(report.biases) >= 1
     assert report.catalog_stats["catalog_coverage"] > 0
     assert len(report.profile_summaries) == report.profiles_tested

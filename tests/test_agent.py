@@ -231,7 +231,7 @@ def test_logger_saves_json():
 
 def test_agent_loop_run_with_mock():
     """Full agent loop with mock LLM — tests the orchestration without real LLM."""
-    songs = load_songs("data/songs.csv")
+    songs = load_songs("data/songs.json")
 
     # Mock that returns different responses based on call order
     class SequenceLLM:

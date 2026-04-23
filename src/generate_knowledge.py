@@ -6,7 +6,7 @@ so the system works without a running LLM. Re-run to regenerate or customize.
 
 Usage:
     python -m src.generate_knowledge
-    python -m src.generate_knowledge --backend ollama --model llama3.1:8b
+    python -m src.generate_knowledge --backend ollama --model llama3.2
     python -m src.generate_knowledge --backend anthropic
 """
 
@@ -19,6 +19,7 @@ from typing import Dict, List
 
 from .recommender import load_songs
 from .llm_provider import get_provider, LLMProvider
+from .env_config import load_dotenv
 
 
 def extract_unique_values(songs: List[Dict], field: str) -> List[str]:
@@ -136,21 +137,22 @@ def main():
     parser.add_argument("--backend", default="ollama", choices=["ollama", "anthropic"],
                         help="LLM backend (default: ollama)")
     parser.add_argument("--model", default=None,
-                        help="Model name (default: llama3.1:8b for ollama, claude-sonnet-4-20250514 for anthropic)")
+                        help="Model name (default: llama3.2 for ollama, claude-sonnet-4-20250514 for anthropic)")
     parser.add_argument("--output-dir", default="data/knowledge",
                         help="Output directory for JSON files (default: data/knowledge)")
-    parser.add_argument("--csv-path", default="data/songs.csv",
-                        help="Path to songs CSV (default: data/songs.csv)")
+    parser.add_argument("--catalog-path", default="data/songs.json",
+                        help="Path to songs JSON catalog (default: data/songs.json)")
     args = parser.parse_args()
 
+    load_dotenv()
     # Set default model per backend
     if args.model is None:
-        args.model = "llama3.1:8b" if args.backend == "ollama" else "claude-sonnet-4-20250514"
+        args.model = "llama3.2" if args.backend == "ollama" else "claude-sonnet-4-20250514"
 
     os.makedirs(args.output_dir, exist_ok=True)
 
-    print(f"Loading songs from {args.csv_path}...")
-    songs = load_songs(args.csv_path)
+    print(f"Loading songs from {args.catalog_path}...")
+    songs = load_songs(args.catalog_path)
 
     genres = extract_unique_values(songs, "genre")
     moods = extract_unique_values(songs, "mood")

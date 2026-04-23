@@ -16,6 +16,7 @@ from .recommender import (
 from tabulate import tabulate
 import subprocess
 import sys
+from .env_config import load_dotenv
 
 
 PROFILES = {
@@ -281,9 +282,10 @@ def run_interactive(songs: list, provider: str = "ollama", model: str = None) ->
     from .agent import AgentLoop
     from .guardrails import format_confidence_badge
 
+    load_dotenv()
     # Default model per provider
     if model is None:
-        model = "llama3.1:8b" if provider == "ollama" else "claude-sonnet-4-20250514"
+        model = "llama3.2" if provider == "ollama" else "claude-sonnet-4-20250514"
 
     print(f"\nGrooveGenius 2.0 — Interactive Mode")
     print(f"Using: {provider}/{model}")
@@ -293,7 +295,7 @@ def run_interactive(songs: list, provider: str = "ollama", model: str = None) ->
         llm = get_provider(provider, model=model)
     except ConnectionError as e:
         print(f"Error: {e}")
-        print("Install Ollama (https://ollama.com) and run: ollama pull llama3.1:8b")
+        print("Install Ollama (https://ollama.com) and run: ollama pull llama3.2")
         return
 
     knowledge = load_knowledge()
@@ -447,7 +449,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    songs = load_songs("data/songs.csv")
+    songs = load_songs("data/songs.json")
 
     if args.interactive:
         run_interactive(songs, provider=args.provider, model=args.model)

@@ -41,7 +41,7 @@ def _load_state():
     """Load songs and knowledge once. Cached at module level."""
     global _songs, _knowledge, _confidence_scorer
     if "_songs" not in globals() or _songs is None:
-        _songs = load_songs("data/songs.csv")
+        _songs = load_songs("data/songs.json")
         try:
             _knowledge = load_knowledge()
         except Exception:
@@ -188,7 +188,7 @@ def handle_recommend(arguments: Dict) -> Dict:
     except ConnectionError:
         return {
             "error": "Ollama is not running. Use recommend_manual instead for offline recommendations.",
-            "suggestion": "Install Ollama (https://ollama.com) and run: ollama pull llama3.1:8b",
+            "suggestion": "Install Ollama (https://ollama.com) and run: ollama pull llama3.2",
         }
 
 
@@ -255,11 +255,11 @@ def handle_echosphere_recommend(arguments: Dict) -> Dict:
 
 def handle_echosphere_ingest(arguments: Dict) -> Dict:
     """Seed (or rebuild) the EchoSphere ChromaDB collection."""
-    from .echosphere.vector_store import ingest_catalog, DEFAULT_CSV_PATH
+    from .echosphere.vector_store import ingest_catalog, DEFAULT_CATALOG_PATH
 
-    csv_path = arguments.get("csv_path", DEFAULT_CSV_PATH)
+    catalog_path = arguments.get("catalog_path") or arguments.get("csv_path", DEFAULT_CATALOG_PATH)
     try:
-        summary = ingest_catalog(csv_path=csv_path)
+        summary = ingest_catalog(catalog_path=catalog_path)
     except Exception as exc:
         return {"error": f"Ingestion failed: {exc}"}
     return {"status": "ok", **summary}
@@ -386,7 +386,7 @@ async def list_tools() -> list[Tool]:
         Tool(
             name="recommend",
             description=(
-                "Get personalized music recommendations from a 30-song catalog using "
+                "Get personalized music recommendations from the song catalog using "
                 "natural language. Uses an agentic loop (requires Ollama LLM). "
                 "For offline use, prefer recommend_manual."
             ),
@@ -495,13 +495,13 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="echosphere_ingest",
-            description="(Re)seed the EchoSphere ChromaDB collection from data/songs.csv.",
+            description="(Re)seed the EchoSphere ChromaDB collection from data/songs.json.",
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "csv_path": {
+                    "catalog_path": {
                         "type": "string",
-                        "description": "Path to the catalog CSV (defaults to data/songs.csv)",
+                        "description": "Path to the catalog JSON (defaults to data/songs.json)",
                     },
                 },
             },
@@ -553,7 +553,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
 async def list_resources() -> list[Resource]:
     return [
         Resource(uri="groovegenius://catalog/songs", name="Song Catalog",
-                 description="Full 30-song catalog as JSON"),
+                 description="Full song catalog as JSON"),
         Resource(uri="groovegenius://catalog/stats", name="Catalog Statistics",
                  description="Genre counts, mood counts, energy distribution"),
         Resource(uri="groovegenius://strategies", name="Ranking Strategies",

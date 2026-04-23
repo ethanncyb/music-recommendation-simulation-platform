@@ -6,7 +6,7 @@ These tests use an in-memory ChromaDB client so they don't touch
 
 from __future__ import annotations
 
-import csv
+import json
 import os
 
 import pytest
@@ -78,12 +78,10 @@ SAMPLE_ROWS = [
 
 
 @pytest.fixture()
-def fake_csv(tmp_path):
-    path = tmp_path / "songs.csv"
-    with open(path, "w", newline="", encoding="utf-8") as fh:
-        writer = csv.DictWriter(fh, fieldnames=list(SAMPLE_ROWS[0].keys()))
-        writer.writeheader()
-        writer.writerows(SAMPLE_ROWS)
+def fake_catalog(tmp_path):
+    path = tmp_path / "songs.json"
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(SAMPLE_ROWS, fh, indent=2)
     return str(path)
 
 
@@ -114,8 +112,8 @@ def test_build_query_vector_defaults():
     assert all(0.0 <= v <= 1.0 for v in vec)
 
 
-def test_ingest_catalog_populates_collection(fake_csv, ephemeral_client):
-    summary = vs.ingest_catalog(csv_path=fake_csv, client=ephemeral_client)
+def test_ingest_catalog_populates_collection(fake_catalog, ephemeral_client):
+    summary = vs.ingest_catalog(catalog_path=fake_catalog, client=ephemeral_client)
     assert summary["count"] == len(SAMPLE_ROWS)
     assert summary["embedding_dim"] == vs.EMBEDDING_DIM
 
@@ -126,8 +124,8 @@ def test_ingest_catalog_populates_collection(fake_csv, ephemeral_client):
     assert collection.count() == len(SAMPLE_ROWS)
 
 
-def test_query_returns_closest_pop_track_first(fake_csv, ephemeral_client):
-    vs.ingest_catalog(csv_path=fake_csv, client=ephemeral_client)
+def test_query_returns_closest_pop_track_first(fake_catalog, ephemeral_client):
+    vs.ingest_catalog(catalog_path=fake_catalog, client=ephemeral_client)
     collection = ephemeral_client.get_collection(
         name=vs.COLLECTION_NAME,
         embedding_function=vs.FeatureVectorEmbedding(),

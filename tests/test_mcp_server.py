@@ -14,6 +14,16 @@ from src.mcp_server import (
     handle_resource_catalog_stats,
     handle_resource_strategies,
 )
+from src.recommender import load_songs
+
+
+def _expected_catalog_stats():
+    songs = load_songs("data/songs.json")
+    return {
+        "total_songs": len(songs),
+        "unique_genres": len({s["genre"] for s in songs}),
+        "unique_moods": len({s["mood"] for s in songs}),
+    }
 
 
 # ── recommend_manual ─────────────────────────────────────────────────────
@@ -101,8 +111,9 @@ def test_explain_song_unknown():
 # ── list_catalog ─────────────────────────────────────────────────────────
 
 def test_list_catalog_all():
+    expected = _expected_catalog_stats()
     result = handle_list_catalog({})
-    assert len(result) == 30
+    assert len(result) == expected["total_songs"]
     assert result[0]["title"]  # has title field
 
 
@@ -142,15 +153,17 @@ def test_audit_bias_with_strategy():
 # ── Resources ────────────────────────────────────────────────────────────
 
 def test_resource_catalog_songs():
+    expected = _expected_catalog_stats()
     data = json.loads(handle_resource_catalog_songs())
-    assert len(data) == 30
+    assert len(data) == expected["total_songs"]
 
 
 def test_resource_catalog_stats():
+    expected = _expected_catalog_stats()
     data = json.loads(handle_resource_catalog_stats())
-    assert data["total_songs"] == 30
-    assert data["unique_genres"] == 27
-    assert data["unique_moods"] == 25
+    assert data["total_songs"] == expected["total_songs"]
+    assert data["unique_genres"] == expected["unique_genres"]
+    assert data["unique_moods"] == expected["unique_moods"]
 
 
 def test_resource_strategies():

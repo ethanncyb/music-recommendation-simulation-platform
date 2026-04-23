@@ -19,6 +19,7 @@ from __future__ import annotations
 import os
 from typing import Any, Dict, List, Optional
 
+from ..env_config import load_dotenv
 from .state import DEFAULT_DNA_PROFILE, EchoState
 from .vector_store import (
     EMBEDDING_DIM,
@@ -132,7 +133,7 @@ def ingestor_node(state: EchoState) -> EchoState:
 
 # ── Researcher Node ─────────────────────────────────────────────────────────
 
-# Mock trivia keyed by the artists that appear in data/songs.csv. Per the
+# Mock trivia keyed by the artists that appear in data/songs.json. Per the
 # design: "Mock a simple dictionary of artist trivia for this step."
 ARTIST_TRIVIA: Dict[str, str] = {
     "Neon Echo": "Cut their debut EP on a hacked Game Boy in 2019.",
@@ -233,6 +234,7 @@ def _build_llm():
     """Instantiate ChatOllama. Lazy so tests can patch before construction."""
     from langchain_ollama import ChatOllama  # local import — optional dep
 
+    load_dotenv()
     model = os.getenv("ECHO_OLLAMA_MODEL", "llama3.2")
     base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
     temperature = float(os.getenv("ECHO_OLLAMA_TEMPERATURE", "0.4"))

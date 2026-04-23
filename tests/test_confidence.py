@@ -9,7 +9,7 @@ from src.self_critique import self_critique_offline
 # ── Test helpers ─────────────────────────────────────────────────────────
 
 def _load():
-    songs = load_songs("data/songs.csv")
+    songs = load_songs("data/songs.json")
     scorer = ConfidenceScorer(songs)
     return songs, scorer
 

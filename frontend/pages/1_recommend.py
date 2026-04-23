@@ -35,7 +35,7 @@ with tab_nl:
     if not ollama_ok:
         st.warning(
             "Ollama is not running. Natural language mode requires a local LLM. "
-            "Install Ollama (https://ollama.com) and run: `ollama pull llama3.1:8b`. "
+            "Install Ollama (https://ollama.com) and run: `ollama pull llama3.2`. "
             "Use the **Manual Profile** tab instead.",
             icon="⚠️",
         )

@@ -20,7 +20,7 @@ python -m src.main --batch --mode agentic
 # Run bias audit (fast pipeline)
 python -m src.main --audit
 
-# Run interactive agent (requires Ollama with llama3.1:8b)
+# Run interactive agent (requires Ollama with llama3.2)
 python -m src.main --interactive
 python -m src.main --interactive --provider anthropic  # or use Claude API
 
@@ -51,10 +51,10 @@ No linter is configured; the project uses manual code review.
 
 ## Architecture
 
-This is a **content-based music recommender** that scores a 30-song catalog against a user's stated preferences and returns the top-k ranked songs with explanations. The repository contains **two pipelines** selectable via `--mode fast|agentic` (CLI), a sidebar toggle (Streamlit), or the `echosphere_*` MCP tools:
+This is a **content-based music recommender** that scores the `data/songs.json` catalog against a user's stated preferences and returns the top-k ranked songs with explanations. The repository contains **two pipelines** selectable via `--mode fast|agentic` (CLI), a sidebar toggle (Streamlit), or the `echosphere_*` MCP tools:
 
 - **Fast mode** — `src/recommender.py` + optional `src/rag.py` (JSON knowledge graphs). Deterministic weighted scoring, no LLM, no vector DB. This is the original GrooveGenius 2.0 stack.
-- **Agentic mode (EchoSphere-RAG)** — `src/echosphere/` — a LangGraph `StateGraph` (Ingestor → Researcher → Reasoning) over a persistent ChromaDB (`data/chroma/`, git-ignored) and `langchain_ollama.ChatOllama`. The Ingestor embeds each track with a 7-dim audio-feature vector (`energy, tempo_norm, valence, danceability, acousticness, instrumentalness, speechiness`) and post-filters results on instrumentalness / speechiness / acousticness thresholds. See [new_design.md](new_design.md) for the original spec and [src/echosphere/__init__.py](src/echosphere/__init__.py) for the module layout.
+- **Agentic mode (EchoSphere-RAG)** — `src/echosphere/` — a LangGraph `StateGraph` (Ingestor → Researcher → Reasoning) over a persistent ChromaDB (`data/chroma/`, git-ignored) and `langchain_ollama.ChatOllama`. The Ingestor embeds each track with a 7-dim audio-feature vector (`energy, tempo_norm, valence, danceability, acousticness, instrumentalness, speechiness`) and post-filters results on instrumentalness / speechiness / acousticness thresholds. See [new_system_design.md](docs/architecture/new_system_design.md) for the original spec and [src/echosphere/__init__.py](src/echosphere/__init__.py) for the module layout.
 
 Shared peripherals (`ConfidenceScorer`, `apply_guardrails`, `BiasAuditor`, Streamlit UI, MCP server) accept either pipeline's output: `ConfidenceScorer.compute` auto-detects `EchoState` dicts, and `BiasAuditor.run_audit(pipeline="agentic")` runs every synthetic profile through EchoSphere-RAG.
 
@@ -62,7 +62,7 @@ Shared peripherals (`ConfidenceScorer`, `apply_guardrails`, `BiasAuditor`, Strea
 
 ```
 UserProfile (genre, mood, energy, likes_acoustic, optional: min_popularity, preferred_decade, preferred_tags)
-  → load_songs() from data/songs.csv
+  → load_songs() from data/songs.json
   → score_song() for each song  [base signals + advanced bonuses → (score, reasons)]
   → recommend_songs()           [greedy diversity re-ranking]
   → Ranked table output
@@ -73,7 +73,7 @@ UserProfile (genre, mood, energy, likes_acoustic, optional: min_popularity, pref
 **Core (v1.0):**
 - **`src/recommender.py`** — Core scoring: `Song`, `UserProfile`, `RankingStrategy` dataclasses; `load_songs()`, `score_song()`, `recommend_songs()` functions; `Recommender` OOP class. Now accepts optional `knowledge` param for RAG.
 - **`src/main.py`** — CLI entry point with `--audit`, `--interactive`, `--provider`, `--model` flags.
-- **`data/songs.csv`** — 30 songs x 17 attributes.
+- **`data/songs.json`** — source catalog with 17 attributes per row.
 
 **RAG + Knowledge (Phase 1):**
 - **`src/rag.py`** — `KnowledgeBase` class, `load_knowledge()` — similarity lookups for genre/mood.
@@ -148,5 +148,5 @@ Tests use the OOP interface; `main.py` uses the functional interface directly.
 
 ### LLM Provider Configuration
 
-- Default provider is local Ollama (`--provider ollama`) and expects `llama3.1:8b` to be available.
+- Default provider is local Ollama (`--provider ollama`) and expects `llama3.2` to be available.
 - Anthropic is optional: install `anthropic` and set `ANTHROPIC_API_KEY`, then run with `--provider anthropic`.

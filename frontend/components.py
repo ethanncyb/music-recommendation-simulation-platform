@@ -5,6 +5,7 @@ Shared UI components and state management for the Streamlit frontend.
 import streamlit as st
 import pandas as pd
 from typing import Dict, List, Optional, Tuple
+import os
 
 from src.recommender import (
     load_songs, recommend_songs, score_song,
@@ -13,6 +14,7 @@ from src.recommender import (
 from src.rag import load_knowledge
 from src.confidence import ConfidenceScorer, ConfidenceReport
 from src.guardrails import apply_guardrails
+from src.env_config import load_dotenv
 
 
 STRATEGIES = {
@@ -31,7 +33,7 @@ MODES = {
 def load_shared_state():
     """Initialize session_state with shared data (songs, knowledge, etc.)."""
     if "songs" not in st.session_state:
-        st.session_state.songs = load_songs("data/songs.csv")
+        st.session_state.songs = load_songs("data/songs.json")
 
     if "knowledge" not in st.session_state:
         try:
@@ -212,8 +214,9 @@ def render_strategy_selector(key: str = "strategy") -> RankingStrategy:
 def check_ollama_available() -> bool:
     """Check if Ollama is reachable."""
     import urllib.request
+    load_dotenv()
     try:
-        urllib.request.urlopen("http://localhost:11434", timeout=2)
+        urllib.request.urlopen(os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"), timeout=2)
         return True
     except Exception:
         return False
