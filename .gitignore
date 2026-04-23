@@ -13,3 +13,7 @@ venv/
 
 # Pytest cache
 .pytest_cache/
+
+# EchoSphere-RAG ChromaDB persistence
+data/chroma/
+/reports

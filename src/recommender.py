@@ -64,9 +64,11 @@ class Recommender:
     OOP implementation of the recommendation logic.
     Required by tests/test_recommender.py
     """
-    def __init__(self, songs: List[Song], strategy: Optional[RankingStrategy] = None):
+    def __init__(self, songs: List[Song], strategy: Optional[RankingStrategy] = None,
+                 knowledge: Optional[Dict] = None):
         self.songs = songs
         self.strategy = strategy if strategy is not None else DEFAULT
+        self.knowledge = knowledge
 
     def recommend(self, user: UserProfile, k: int = 5) -> List[Song]:
         """Returns the top-k songs sorted by score descending, with diversity penalty."""
@@ -83,7 +85,7 @@ class Recommender:
             "preferred_tags": user.preferred_tags,
         }
 
-        remaining = [(song, score_song(user_prefs, song.__dict__, self.strategy)[0]) for song in self.songs]
+        remaining = [(song, score_song(user_prefs, song.__dict__, self.strategy, self.knowledge)[0]) for song in self.songs]
 
         selected: List[Song] = []
         selected_artists: set = set()
@@ -120,7 +122,7 @@ class Recommender:
             "preferred_decade": user.preferred_decade,
             "preferred_tags": user.preferred_tags,
         }
-        _, reasons = score_song(user_prefs, song.__dict__, self.strategy)
+        _, reasons = score_song(user_prefs, song.__dict__, self.strategy, self.knowledge)
         return "; ".join(reasons)
 
 def load_songs(csv_path: str) -> List[Dict]:
@@ -153,25 +155,48 @@ def load_songs(csv_path: str) -> List[Dict]:
     print(f"Loaded songs: {len(songs)}")
     return songs
 
-def score_song(user_prefs: Dict, song: Dict, strategy: Optional[RankingStrategy] = None) -> Tuple[float, List[str]]:
-    """Scores a single song against user preferences; returns (score, reasons)."""
+def score_song(user_prefs: Dict, song: Dict, strategy: Optional[RankingStrategy] = None, knowledge: Optional[Dict] = None) -> Tuple[float, List[str]]:
+    """Scores a single song against user preferences; returns (score, reasons).
+
+    When knowledge is provided, genre and mood scoring uses similarity lookups
+    instead of binary matching, giving partial credit for related genres/moods.
+    When knowledge is None, behavior is identical to the original binary matching.
+    """
     if strategy is None:
         strategy = DEFAULT
     reasons = []
 
-    # Signal 1: Genre match (binary)
-    if song["genre"] == user_prefs["genre"]:
-        genre_score = 1.0
-        reasons.append(f"Matches your favorite genre: {song['genre']}")
+    # Signal 1: Genre match (similarity-aware when knowledge is available)
+    if knowledge and "genre_similarity" in knowledge:
+        genre_score = knowledge["genre_similarity"](user_prefs["genre"], song["genre"])
+        if genre_score >= 1.0:
+            reasons.append(f"Matches your favorite genre: {song['genre']}")
+        elif genre_score >= 0.6:
+            reasons.append(f"Similar genre: {song['genre']} ({genre_score:.0%} match to {user_prefs['genre']})")
+        elif genre_score >= 0.3:
+            reasons.append(f"Somewhat related genre: {song['genre']} ({genre_score:.0%} match to {user_prefs['genre']})")
     else:
-        genre_score = 0.0
+        if song["genre"] == user_prefs["genre"]:
+            genre_score = 1.0
+            reasons.append(f"Matches your favorite genre: {song['genre']}")
+        else:
+            genre_score = 0.0
 
-    # Signal 2: Mood match (binary)
-    if song["mood"] == user_prefs["mood"]:
-        mood_score = 1.0
-        reasons.append(f"Matches your favorite mood: {song['mood']}")
+    # Signal 2: Mood match (similarity-aware when knowledge is available)
+    if knowledge and "mood_similarity" in knowledge:
+        mood_score = knowledge["mood_similarity"](user_prefs["mood"], song["mood"])
+        if mood_score >= 1.0:
+            reasons.append(f"Matches your favorite mood: {song['mood']}")
+        elif mood_score >= 0.6:
+            reasons.append(f"Similar mood: {song['mood']} ({mood_score:.0%} match to {user_prefs['mood']})")
+        elif mood_score >= 0.3:
+            reasons.append(f"Somewhat related mood: {song['mood']} ({mood_score:.0%} match to {user_prefs['mood']})")
     else:
-        mood_score = 0.0
+        if song["mood"] == user_prefs["mood"]:
+            mood_score = 1.0
+            reasons.append(f"Matches your favorite mood: {song['mood']}")
+        else:
+            mood_score = 0.0
 
     # Signal 3: Energy proximity
     energy_score = 1.0 - abs(song["energy"] - user_prefs["energy"])
@@ -249,13 +274,16 @@ def score_song(user_prefs: Dict, song: Dict, strategy: Optional[RankingStrategy]
 
     return (score, reasons)
 
-def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5, strategy: Optional[RankingStrategy] = None) -> List[Tuple[Dict, float, str]]:
+def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5, strategy: Optional[RankingStrategy] = None, knowledge: Optional[Dict] = None) -> List[Tuple[Dict, float, str]]:
     """Scores all songs and returns the top-k using greedy diversity-aware re-ranking.
 
     A diversity penalty is applied before each selection to de-prioritize songs
     whose artist or genre is already represented in the current results:
       - Artist repeat: -0.30
       - Genre repeat:  -0.15
+
+    When knowledge is provided, it is forwarded to score_song() for similarity-based
+    genre/mood matching instead of binary matching.
     """
     if strategy is None:
         strategy = DEFAULT
@@ -264,7 +292,7 @@ def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5, strategy: O
 
     remaining = []
     for song in songs:
-        score, reasons = score_song(user_prefs, song, strategy)
+        score, reasons = score_song(user_prefs, song, strategy, knowledge)
         explanation = "; ".join(reasons)
         remaining.append((song, score, explanation))
 
