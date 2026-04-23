@@ -134,10 +134,10 @@ def main():
     parser = argparse.ArgumentParser(
         description="Generate genre/mood similarity knowledge graphs using an LLM."
     )
-    parser.add_argument("--backend", default="ollama", choices=["ollama", "anthropic"],
+    parser.add_argument("--backend", default="ollama", choices=["ollama", "anthropic", "gemini"],
                         help="LLM backend (default: ollama)")
     parser.add_argument("--model", default=None,
-                        help="Model name (default: llama3.2 for ollama, claude-sonnet-4-20250514 for anthropic)")
+                        help="Model name (default: llama3.2 for ollama, claude-sonnet-4-20250514 for anthropic, gemma-4-27b-it for gemini)")
     parser.add_argument("--output-dir", default="data/knowledge",
                         help="Output directory for JSON files (default: data/knowledge)")
     parser.add_argument("--catalog-path", default="data/songs.json",
@@ -147,7 +147,11 @@ def main():
     load_dotenv()
     # Set default model per backend
     if args.model is None:
-        args.model = "llama3.2" if args.backend == "ollama" else "claude-sonnet-4-20250514"
+        args.model = {
+            "ollama": "llama3.2",
+            "anthropic": "claude-sonnet-4-20250514",
+            "gemini": "gemma-4-27b-it",
+        }.get(args.backend, "llama3.2")
 
     os.makedirs(args.output_dir, exist_ok=True)
 

@@ -1,9 +1,10 @@
 """
 LLM Provider abstraction layer.
 
-Supports two backends:
+Supports three backends:
   - Ollama (default): free, local, no API key needed
   - Anthropic (optional): cloud-based, requires ANTHROPIC_API_KEY env var
+  - Gemini (optional): Google AI, requires GEMINI_API_KEY env var
 
 Usage:
     from src.llm_provider import get_provider
@@ -12,6 +13,9 @@ Usage:
     response = llm.generate("Say hello")
 
     llm = get_provider("anthropic")
+    response = llm.generate("Say hello")
+
+    llm = get_provider("gemini")
     response = llm.generate("Say hello")
 """
 
@@ -118,11 +122,117 @@ class AnthropicProvider(LLMProvider):
         return resp.content[0].text
 
 
+class GeminiProvider(LLMProvider):
+    """Google Gemini API provider (free tier supported)."""
+
+    def __init__(self, model: str = "gemma-4-27b-it"):
+        load_dotenv()
+        api_key = os.environ.get("GEMINI_API_KEY")
+        if not api_key:
+            raise ValueError(
+                "Set GEMINI_API_KEY environment variable to use the Gemini provider. "
+                "Get a free key at https://aistudio.google.com/apikey"
+            )
+        self.api_key = api_key
+        self.model = model
+        self.base_url = "https://generativelanguage.googleapis.com/v1beta"
+
+    def generate(self, prompt: str, system: Optional[str] = None) -> str:
+        import urllib.request
+        import urllib.error
+
+        url = f"{self.base_url}/models/{self.model}:generateContent?key={self.api_key}"
+
+        contents = []
+        if system:
+            contents.append({
+                "role": "user",
+                "parts": [{"text": f"[System instructions]: {system}"}],
+            })
+            contents.append({
+                "role": "model",
+                "parts": [{"text": "Understood. I will follow those instructions."}],
+            })
+        contents.append({"role": "user", "parts": [{"text": prompt}]})
+
+        payload = {
+            "contents": contents,
+            "generationConfig": {
+                "temperature": 0.3,
+                "maxOutputTokens": 4096,
+            },
+        }
+
+        data = json.dumps(payload).encode("utf-8")
+        req = urllib.request.Request(
+            url,
+            data=data,
+            headers={"Content-Type": "application/json"},
+        )
+
+        try:
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                body = json.loads(resp.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            error_body = e.read().decode("utf-8", errors="replace")
+            try:
+                error_detail = json.loads(error_body)
+                msg = error_detail.get("error", {}).get("message", error_body)
+            except json.JSONDecodeError:
+                msg = error_body
+            if e.code == 429:
+                raise ConnectionError(
+                    f"Gemini API rate limit exceeded (HTTP 429). "
+                    f"Free tier has limited requests per minute. "
+                    f"Wait a moment and retry. Detail: {msg}"
+                )
+            elif e.code == 403:
+                raise ConnectionError(
+                    f"Gemini API access denied (HTTP 403). "
+                    f"Check your GEMINI_API_KEY and ensure the model '{self.model}' "
+                    f"is available. Detail: {msg}"
+                )
+            elif e.code == 400:
+                raise ValueError(
+                    f"Gemini API bad request (HTTP 400). Detail: {msg}"
+                )
+            else:
+                raise ConnectionError(
+                    f"Gemini API error (HTTP {e.code}): {msg}"
+                )
+        except urllib.error.URLError as e:
+            raise ConnectionError(
+                f"Cannot reach Gemini API: {e.reason}. Check your internet connection."
+            )
+
+        # Extract text from the response
+        try:
+            candidates = body.get("candidates", [])
+            if not candidates:
+                # Check for prompt-level blocking
+                block_reason = body.get("promptFeedback", {}).get("blockReason", "")
+                if block_reason:
+                    raise ValueError(
+                        f"Gemini blocked the prompt (reason: {block_reason}). "
+                        "Try rephrasing your request."
+                    )
+                raise ValueError("Gemini returned no candidates in the response.")
+            parts = candidates[0].get("content", {}).get("parts", [])
+            if not parts:
+                finish_reason = candidates[0].get("finishReason", "UNKNOWN")
+                raise ValueError(
+                    f"Gemini returned empty content (finishReason: {finish_reason})."
+                )
+            return parts[0]["text"]
+        except (KeyError, IndexError) as e:
+            raise ValueError(f"Unexpected Gemini API response structure: {e}")
+
+
 def get_provider(backend: str = "ollama", **kwargs) -> LLMProvider:
     """Factory function to create an LLM provider.
 
     Args:
-        backend: "ollama" (default) or "anthropic"
+        backend: "ollama", "anthropic", or "gemini"
         **kwargs: passed to the provider constructor (e.g., model, base_url)
     """
     load_dotenv()
@@ -130,5 +240,7 @@ def get_provider(backend: str = "ollama", **kwargs) -> LLMProvider:
         return OllamaProvider(**kwargs)
     elif backend == "anthropic":
         return AnthropicProvider(**kwargs)
+    elif backend == "gemini":
+        return GeminiProvider(**kwargs)
     else:
-        raise ValueError(f"Unknown backend: {backend!r}. Use 'ollama' or 'anthropic'.")
+        raise ValueError(f"Unknown backend: {backend!r}. Use 'ollama', 'anthropic', or 'gemini'.")

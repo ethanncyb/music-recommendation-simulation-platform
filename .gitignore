@@ -19,3 +19,4 @@ venv/
 data/chroma/
 /reports
 /docs/phases
+/logs

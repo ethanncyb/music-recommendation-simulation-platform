@@ -14,6 +14,7 @@ from .recommender import (
     DEFAULT, GENRE_FIRST, MOOD_FIRST, ENERGY_FOCUSED, RankingStrategy,
 )
 from tabulate import tabulate
+import os
 import subprocess
 import sys
 from .env_config import load_dotenv
@@ -285,7 +286,11 @@ def run_interactive(songs: list, provider: str = "ollama", model: str = None) ->
     load_dotenv()
     # Default model per provider
     if model is None:
-        model = "llama3.2" if provider == "ollama" else "claude-sonnet-4-20250514"
+        model = {
+            "ollama": "llama3.2",
+            "anthropic": "claude-sonnet-4-20250514",
+            "gemini": "gemma-4-27b-it",
+        }.get(provider, "llama3.2")
 
     print(f"\nGrooveGenius 2.0 — Interactive Mode")
     print(f"Using: {provider}/{model}")
@@ -293,9 +298,12 @@ def run_interactive(songs: list, provider: str = "ollama", model: str = None) ->
 
     try:
         llm = get_provider(provider, model=model)
-    except ConnectionError as e:
+    except (ConnectionError, ValueError, ImportError) as e:
         print(f"Error: {e}")
-        print("Install Ollama (https://ollama.com) and run: ollama pull llama3.2")
+        if provider == "ollama":
+            print("Install Ollama (https://ollama.com) and run: ollama pull llama3.2")
+        elif provider == "gemini":
+            print("Get a free Gemini API key at https://aistudio.google.com/apikey")
         return
 
     knowledge = load_knowledge()
@@ -369,6 +377,93 @@ def run_audit(songs: list) -> None:
     auditor.save_report(report)
 
 
+def run_batch_online(songs: list, provider: str = "gemini", model: str = None) -> None:
+    """Run the 4 demo profiles through the AgentLoop with an online LLM."""
+    from .llm_provider import get_provider
+    from .rag import load_knowledge
+    from .agent import AgentLoop
+    from .guardrails import format_confidence_badge
+    from .confidence import ConfidenceReport
+
+    load_dotenv()
+    if model is None:
+        model = {
+            "anthropic": "claude-sonnet-4-20250514",
+            "gemini": "gemma-4-27b-it",
+        }.get(provider, "gemma-4-27b-it")
+
+    print(f"\nGrooveGenius 2.0 — Online LLM Batch Demo")
+    print(f"Using: {provider}/{model}\n")
+
+    try:
+        llm = get_provider(provider, model=model)
+    except (ConnectionError, ValueError, ImportError) as e:
+        print(f"Error: {e}")
+        if provider == "gemini":
+            print("Get a free Gemini API key at https://aistudio.google.com/apikey")
+        return
+
+    knowledge = load_knowledge()
+    agent = AgentLoop(llm=llm, songs=songs, knowledge=knowledge)
+
+    for name, prefs in PROFILES.items():
+        query = (
+            f"Recommend music for a '{name}' listener who likes {prefs['genre']}, "
+            f"{prefs['mood']} mood, energy={prefs['energy']}, "
+            f"likes_acoustic={prefs.get('likes_acoustic', False)}"
+        )
+
+        print(f"\n{'='*60}")
+        print(f"  Profile: {name}  [Mode: online — {provider}/{model}]")
+        print(f"  genre={prefs['genre']} | mood={prefs['mood']} | "
+              f"energy={prefs['energy']} | likes_acoustic={prefs['likes_acoustic']}")
+        print("=" * 60)
+
+        try:
+            result = agent.chat(query)
+        except (ConnectionError, ValueError) as e:
+            print(f"\n  [Error] {e}\n")
+            continue
+
+        # Show reasoning trace
+        for step in result.get("reasoning_trace", []):
+            print(f"  [{step}]")
+
+        # Show results table
+        recommendations = result.get("results", [])
+        if recommendations:
+            print(f"\nTop {len(recommendations)} Recommendations:\n")
+            table_rows = []
+            for rank, (song, score, explanation) in enumerate(recommendations, start=1):
+                reasons_short = "; ".join(explanation.split("; ")[:3])
+                table_rows.append([
+                    rank, song["title"], song["artist"],
+                    song["genre"], f"{score:.4f}", reasons_short,
+                ])
+            print(tabulate(
+                table_rows,
+                headers=["#", "Title", "Artist", "Genre", "Score", "Reasons"],
+                tablefmt="rounded_outline",
+                colalign=("center", "left", "left", "left", "center", "left"),
+            ))
+
+        # Show confidence
+        conf = result.get("confidence", {})
+        report = ConfidenceReport(
+            overall_confidence=conf.get("score", 0),
+            confidence_label=conf.get("label", "?"),
+            signals=conf.get("signals", {}),
+            warnings=conf.get("warnings", []),
+        )
+        print(f"\n  {format_confidence_badge(report)} ({report.overall_confidence:.2f})")
+
+        if result.get("guardrail"):
+            print(f"  >> {result['guardrail']}")
+        if result.get("critique"):
+            print(f"\n  Self-Critique: {result['critique']}")
+        print()
+
+
 def run_batch(songs: list, mode: str = "fast") -> None:
     """Run the default batch profile demo.
 
@@ -392,39 +487,84 @@ def run_tests() -> None:
         print(f"\nTests finished with failures (exit code {result.returncode}).")
 
 
+def _get_online_provider() -> tuple:
+    """Read the online LLM provider from ONLINE_LLM_PROVIDER env var.
+
+    Returns (provider, model) or (None, None) if not configured.
+    """
+    load_dotenv()
+    provider = os.environ.get("ONLINE_LLM_PROVIDER", "").strip().lower()
+    if provider not in {"anthropic", "gemini"}:
+        print(
+            "\n  ONLINE_LLM_PROVIDER is not set or invalid in your .env file."
+            "\n  Set it to 'anthropic' or 'gemini' and provide the matching API key."
+        )
+        return None, None
+    model = None  # uses default per provider
+    return provider, model
+
+
+def _select_chatbot_provider() -> tuple:
+    """Sub-menu to choose between offline, local LLM, or online LLM.
+
+    Returns (provider, model) or (None, None) if the user cancels.
+    """
+    print("\n  Chatbot Mode — Select LLM source:")
+    print("  1) Local LLM      (Ollama — runs on your machine)")
+    print("  2) Online LLM     (uses ONLINE_LLM_PROVIDER from .env)")
+    print("  0) Back")
+
+    choice = input("\n  Select [0-2]: ").strip()
+
+    if choice == "0":
+        return None, None
+    elif choice == "1":
+        model = input("  Ollama model (default: llama3.2): ").strip() or None
+        return "ollama", model
+    elif choice == "2":
+        return _get_online_provider()
+    else:
+        print("  Invalid selection.")
+        return None, None
+
+
 def run_menu(songs: list) -> None:
     """Default interactive menu for local usage."""
     while True:
         print("\nGrooveGenius 2.0")
         print("1) Run profile demo (batch, fast mode)")
         print("2) Run profile demo (batch, agentic EchoSphere-RAG)")
-        print("3) Run bias audit")
-        print("4) Start chatbot mode")
-        print("5) Run tests")
-        print("6) Exit")
+        print("3) Run profile demo (batch, online LLM)")
+        print("4) Run bias audit")
+        print("5) Start chatbot mode")
+        print("6) Run tests")
+        print("7) Exit")
 
-        choice = input("\nSelect an option [1-6]: ").strip()
+        choice = input("\nSelect an option [1-7]: ").strip()
 
         if choice == "1":
             run_batch(songs, mode="fast")
         elif choice == "2":
             run_batch(songs, mode="agentic")
         elif choice == "3":
-            run_audit(songs)
-        elif choice == "4":
-            provider = input("Provider [ollama/anthropic] (default: ollama): ").strip().lower() or "ollama"
-            if provider not in {"ollama", "anthropic"}:
-                print("Invalid provider. Use 'ollama' or 'anthropic'.")
+            provider, model = _get_online_provider()
+            if provider is None:
                 continue
-            model = input("Model override (press Enter for default): ").strip() or None
-            run_interactive(songs, provider=provider, model=model)
+            run_batch_online(songs, provider=provider, model=model)
+        elif choice == "4":
+            run_audit(songs)
         elif choice == "5":
-            run_tests()
+            provider, model = _select_chatbot_provider()
+            if provider is None:
+                continue
+            run_interactive(songs, provider=provider, model=model)
         elif choice == "6":
+            run_tests()
+        elif choice == "7":
             print("Goodbye.")
             break
         else:
-            print("Invalid selection. Please choose 1-6.")
+            print("Invalid selection. Please choose 1-7.")
 
 
 def main() -> None:
@@ -435,8 +575,8 @@ def main() -> None:
     parser.add_argument("--audit", action="store_true",
                         help="Run bias auditor instead of batch recommendations")
     parser.add_argument("--interactive", action="store_true",
-                        help="Launch conversational agent (requires Ollama or --provider anthropic)")
-    parser.add_argument("--provider", default="ollama", choices=["ollama", "anthropic"],
+                        help="Launch conversational agent (requires Ollama, --provider anthropic, or --provider gemini)")
+    parser.add_argument("--provider", default="ollama", choices=["ollama", "anthropic", "gemini"],
                         help="LLM provider for interactive mode (default: ollama)")
     parser.add_argument("--model", default=None,
                         help="Model name override for the LLM provider")

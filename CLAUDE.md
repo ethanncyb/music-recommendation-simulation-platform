@@ -23,6 +23,7 @@ python -m src.main --audit
 # Run interactive agent (requires Ollama with llama3.2)
 python -m src.main --interactive
 python -m src.main --interactive --provider anthropic  # or use Claude API
+python -m src.main --interactive --provider gemini     # or use Gemini (free tier)
 
 # Launch Streamlit web UI (sidebar toggle selects fast vs agentic)
 streamlit run frontend/app.py
@@ -77,7 +78,7 @@ UserProfile (genre, mood, energy, likes_acoustic, optional: min_popularity, pref
 
 **RAG + Knowledge (Phase 1):**
 - **`src/rag.py`** — `KnowledgeBase` class, `load_knowledge()` — similarity lookups for genre/mood.
-- **`src/llm_provider.py`** — `OllamaProvider`, `AnthropicProvider`, `get_provider()` factory.
+- **`src/llm_provider.py`** — `OllamaProvider`, `AnthropicProvider`, `GeminiProvider`, `get_provider()` factory.
 - **`src/generate_knowledge.py`** — CLI script to regenerate knowledge graphs via LLM.
 - **`data/knowledge/genre_graph.json`** / **`mood_graph.json`** — Pre-shipped similarity matrices.
 
@@ -150,3 +151,4 @@ Tests use the OOP interface; `main.py` uses the functional interface directly.
 
 - Default provider is local Ollama (`--provider ollama`) and expects `llama3.2` to be available.
 - Anthropic is optional: install `anthropic` and set `ANTHROPIC_API_KEY`, then run with `--provider anthropic`.
+- Gemini is optional (free tier): set `GEMINI_API_KEY`, then run with `--provider gemini`. Default model is `gemma-4-27b-it`.
