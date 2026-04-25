@@ -1,177 +1,107 @@
-# 🎵 Music Recommender Simulation
+# music-recommendation-simulation-platform
 
-## Project Summary
+## Original project and this extension
 
-In this project you will build and explain a small music recommender system.
+This repository extends the **AI110 music recommender simulation starter** (module show baseline). The original scope was a **content-based** recommender: load a fixed catalog from `data/songs.json`, score each song with explicit weighted signals (genre, mood, energy, acoustic fit), rank deterministically, and print human-readable explanations—no external services required.
 
-Your goal is to:
+**GrooveGenius 2.0** keeps that fast, reproducible core in `src/recommender.py` and adds integrated applied-AI features on top of the same catalog: **EchoSphere-RAG** (LangGraph + ChromaDB audio-feature retrieval + LLM explanations in `src/echosphere/`), **optional RAG** for partial genre/mood credit in fast mode (`src/rag.py`), **confidence scoring, guardrails, and offline self-critique** (`src/confidence.py`, `src/guardrails.py`, `src/self_critique.py`), a **bias auditing** pipeline with JSON reports (`src/bias_auditor.py`), a **Streamlit** front end (`frontend/`), **interactive agent** mode (`src/agent.py`, `src/main.py --interactive`), and an **MCP** server for external agents (`src/mcp_server.py`). Mode is selected per run (`--mode fast|agentic`), in the Streamlit sidebar, or via MCP tools.
 
-- Represent songs and a user "taste profile" as data
-- Design a scoring rule that turns that data into recommendations
-- Evaluate what your system gets right and wrong
-- Reflect on how this mirrors real world AI recommenders
-
-Replace this paragraph with your own summary of what your version does.
+**Documentation:** Architecture and data-flow diagrams → [docs/architecture/WORKFLOWS.md](docs/architecture/WORKFLOWS.md).
 
 ---
 
-## How The System Works
+## Project summary
 
-Real world recommendation systems, like those used by Spotify and YouTube, typically combine multiple approaches to suggest content. They rely on collaborative filtering to learn from the behavior of similar users, as well as content based methods that analyze features such as genre, mood, and energy. These signals are then combined and ranked to balance relevance, engagement, and occasional novelty. In my project, the focus is on the content based approach, prioritizing direct alignment with a user’s stated preferences and providing clear explanations for each recommendation so the reasoning behind every suggestion is easy to understand.
+- **Fast mode** — deterministic weighted scoring (`src/recommender.py`). No LLM, no vector DB for core ranking.
+- **Agentic mode (EchoSphere-RAG)** — LangGraph pipeline: **Ingestor** (ChromaDB), **Researcher** (mock trivia), **Reasoning** (LLM) → DJ-style explanations (`src/echosphere/`).
 
-### Song Features
+Pick the mode via `--mode fast|agentic` on the CLI, the Streamlit sidebar, or MCP (`echosphere_*` tools where applicable).
 
-Each `Song` stores 9 attributes loaded from `data/songs.csv`:
+---
 
-| Feature | Type | Description |
-|---------|------|-------------|
-| `genre` | string | Musical style (27 genres including pop, lofi, rock, jazz, ambient, hip-hop, edm, metal, classical, reggae, funk, and more) |
-| `mood` | string | Emotional tone (25 moods including happy, chill, intense, relaxed, euphoric, nostalgic, angry, romantic, and more) |
-| `energy` | float 0–1 | Perceived intensity and activity level |
-| `tempo_bpm` | float | Beats per minute (~58–168) |
-| `valence` | float 0–1 | Musical positiveness |
-| `danceability` | float 0–1 | How suitable the song is for dancing |
-| `acousticness` | float 0–1 | How acoustic (vs. electronic/produced) the song sounds |
-| `instrumentalness` | float 0–1 | Likelihood the track contains no vocals |
-| `speechiness` | float 0–1 | Presence of spoken words (high = rap/podcast, low = pure music) |
+## Quick verification
 
-### User Profile
+- `pytest` — full automated harness.
+- `python -m src.main` — fast batch: four profiles + strategy comparison tables.
+- `python -m src.main --audit` — bias audit to console + `reports/bias_audit_*.json`.
+- `python -m streamlit run frontend/app.py` — UI (recommend, explore, audit, logs); toggle fast / agentic in the sidebar.
+- Agentic smoke: `ollama serve` → `python -m src.echosphere.vector_store` → `python -m src.echosphere.graph` (prints final JSON state) or `python -m src.main --batch --mode agentic`.
 
-A `UserProfile` stores four preference fields that drive the scoring:
+---
 
-- `favorite_genre`: the genre the user most wants to hear
-- `favorite_mood`: the emotional tone the user is seeking right now
-- `target_energy`: a float 0–1 representing the user's preferred intensity level
-- `likes_acoustic`: a boolean indicating whether the user prefers acoustic or produced sounds
+## Sample inputs and expected behavior
 
-### Scoring Rule (one song at a time)
+| Example | What you should see |
+|---------|----------------------|
+| `python -m src.main` | Four named profiles (e.g. High-Energy Pop, Chill Lofi); each prints a **tabulate** table (rank, title, artist, genre, score, reasons) plus confidence line and optional self-critique when confidence is very low. |
+| `python -m src.main --audit` | Console summary of synthetic profiles tested and bias signatures; JSON written under `reports/`. |
+| `python -m src.echosphere.graph` (after seeding Chroma, Ollama running) | JSON stdout with keys such as `user_request`, `retrieved_tracks`, `explanations`, `artist_trivia` (or `error` if DB/LLM missing). |
 
-The recommender computes a score in [0, 1] for each song using a weighted combination of four signals:
+Additional copy-paste flow for agentic mode:
 
-```
-score = (0.35 × genre_match)
-      + (0.30 × mood_match)
-      + (0.25 × energy_proximity)
-      + (0.10 × acoustic_fit)
+```bash
+pip install -r requirements.txt
+ollama pull llama3.2
+# terminal 1: ollama serve
+python -m src.echosphere.vector_store
+python -m src.echosphere.graph
 ```
 
-- **Genre and mood** are binary signals: 1.0 if the song matches the user's preference, 0.0 if not.
-- **Energy** uses a *proximity formula* that rewards closeness to the user's target, not just higher or lower values:
-  ```
-  energy_score = 1 - |song.energy - user.target_energy|
-  ```
-  A song at 0.82 scores higher than one at 0.93 for a user who wants 0.80, even though 0.93 is "more energetic." The gap matters, not the direction.
-- **Acoustic fit** maps the boolean preference to a continuous score: `song.acousticness` if the user likes acoustic, `1 - song.acousticness` if they don't.
+---
 
-### Ranking Rule (choosing which songs to recommend)
+## Why this project matters (brief)
 
-1. Score every song in the catalog using the Scoring Rule
-2. Sort all songs descending by score
-3. Return the top-k songs with their scores and explanations
+The starter optimized for transparent ranking; the extension adds **explainability under weak catalog coverage**, **auditable bias checks**, and an **agentic path** that still shares the same data and confidence layers. Reliability is addressed through tests, confidence labels, guardrail text—not by hiding low-quality matches.
 
-Every song gets scored (no pre-filtering), so a surprisingly good match is never missed.
+---
 
-### Data Flow
+## How the system works
 
-See [`flowchart.md`](docs/flowchart.md) for the full Mermaid.js diagram. The flow in brief:
+Content-based focus: user preferences align to song features in `data/songs.json`. Full scoring tables, strategies, and diversity penalties are unchanged in spirit from the extended starter; see sections below.
+
+### Song features
+
+Each song stores attributes loaded from `data/songs.json` (genre, mood, energy, tempo, valence, danceability, acousticness, instrumentalness, speechiness, plus extended fields such as popularity and `detailed_moods` where implemented).
+
+### User profile (fast mode)
+
+Preferences drive scoring: genre, mood, target energy, likes acoustic, plus optional advanced fields (tags, decade, popularity) as implemented in `src/recommender.py`.
+
+### Scoring and ranking
+
+Weighted combination of signals; strategies (`DEFAULT`, `GENRE_FIRST`, `MOOD_FIRST`, `ENERGY_FOCUSED`) reweight the same functions. Greedy diversity penalties reduce repeated artist/genre in top-k.
+
+### Data flow
+
+Canonical diagrams (fast path, EchoSphere chain, reliability stack): **[docs/architecture/WORKFLOWS.md](docs/architecture/WORKFLOWS.md)**.
+
+Fast mode in brief:
 
 ```
-Input (User Prefs + songs.csv)
+Input (user prefs + songs.json)
   → load_songs()
-  → For each song: score_song()
-      → genre_score + mood_score + energy_score + acoustic_score
-      → weighted sum → (score, reasons)
-  → sort descending
-  → slice top-k
-  → Output: Ranked Recommendations (song, score, explanation)
+  → recommend_songs() / score_song() [optional RAG knowledge]
+  → sort, top-k, explanations
+  → ConfidenceScorer + guardrails (+ self-critique when enabled)
 ```
 
-### Sample Output
+### Stress-test profiles
 
-![Terminal output showing top 5 recommendations for a pop/happy profile](pics/sample_output.png)
+Four CLI profiles in `src/main.py` (`PROFILES`): High-Energy Pop, Chill Lofi, Deep Intense Rock, Conflicted Listener (adversarial high-energy classical).
 
-### Stress Test: Diverse Profiles
+### Known biases
 
-Four distinct user profiles were run to evaluate the recommender's behavior across different taste shapes, including one adversarial edge case.
-
-**High-Energy Pop** (`genre=pop`, `mood=happy`, `energy=0.9`, `likes_acoustic=False`)
-
-![High-Energy Pop profile recommendations](pics/diverse_profiles_1.png)
-
-**Chill Lofi** (`genre=lofi`, `mood=chill`, `energy=0.2`, `likes_acoustic=True`)
-
-![Chill Lofi profile recommendations](pics/diverse_profiles_2.png)
-
-**Deep Intense Rock** (`genre=rock`, `mood=angry`, `energy=0.95`, `likes_acoustic=False`)
-
-![Deep Intense Rock profile recommendations](pics/diverse_profiles_3.png)
-
-**Conflicted Listener (Edge Case)** (`genre=classical`, `mood=sad`, `energy=0.9`, `likes_acoustic=True`)  
-*Adversarial profile: classical music is naturally low-energy, but this profile requests high energy (0.9), designed to surface conflicts in the scoring logic.*
-
-![Conflicted Listener edge case profile recommendations](pics/diverse_profiles_4.png)
-
-### Known Biases
-
-- **Genre dominance:** At 0.35 weight, genre is the single largest signal. A song that matches genre but has the wrong mood and poor energy can still outscore a song with a perfect energy match and no genre match. Great songs in the "wrong" genre are systematically underranked.
-- **Catalog sparsity amplifies energy:** With 27 unique genres across 30 songs, most genre queries match only 1–2 songs. For the remaining 28+ songs that score 0 on genre, energy (0.25 weight) becomes the primary differentiator, giving it more practical influence than its weight suggests.
-- **Mood granularity:** 25 unique moods means most moods appear only once. A user seeking "nostalgic" gets exactly one mood match; all other songs are judged on energy and acoustic alone.
-- **No cross-feature interaction:** The system treats genre and mood as independent. It cannot detect that "chill lofi" and "intense rock" are meaningfully different combinations; a song can score well on genre alone without capturing the session's emotional intent.
+Genre weight and catalog sparsity can dominate; mood cardinality limits matches; genre and mood are scored independently. Auditing helps surface systematic skew.
 
 ---
 
-## Challenge Implementations
+## Challenge implementations
 
-### Challenge 1 — Advanced Song Features
-
-Seven new attributes were added to `data/songs.csv` beyond the baseline set:
-
-| Feature | Type | Description |
-|---------|------|-------------|
-| `popularity` | int 0–100 | Stream-count-derived popularity score |
-| `release_year` | int | Year the track was released |
-| `key_signature` | string | Musical key (e.g., "C Major", "A Minor") |
-| `time_signature` | int | Beats per measure (3 or 4) |
-| `detailed_moods` | string | Pipe-separated mood tags (e.g., `"upbeat\|energetic\|bright"`) |
-| `instrumentalness` | float 0–1 | Likelihood of no vocals |
-| `speechiness` | float 0–1 | Presence of spoken words |
-
-Three of these drive scoring bonuses on top of the base weighted score:
-- **Popularity** (Signal 5): songs at or above `min_popularity` receive up to +0.08
-- **Release era** (Signal 6): songs from the user's `preferred_decade` receive up to +0.06, dropping 0.25 per decade away
-- **Mood tags** (Signal 7): tag overlap between song `detailed_moods` and user `preferred_tags` adds up to +0.10
-
-### Challenge 2 — Multiple Scoring Modes
-
-A `RankingStrategy` dataclass carries four weights (`genre`, `mood`, `energy`, `acoustic`). Four built-in strategies let users switch ranking emphasis without touching any scoring logic:
-
-| Strategy | Genre | Mood | Energy | Acoustic |
-|----------|-------|------|--------|----------|
-| `DEFAULT` | 16% | 28% | 47% | 9% |
-| `GENRE_FIRST` | 50% | 25% | 20% | 5% |
-| `MOOD_FIRST` | 15% | 55% | 25% | 5% |
-| `ENERGY_FOCUSED` | 10% | 10% | 75% | 5% |
-
-Each user profile in `main.py` is assigned a strategy via `PROFILE_STRATEGIES`. A `compare_strategies()` function runs all four modes on the same profile and prints a side-by-side table of the top-ranked song per strategy.
-
-### Challenge 3 — Diversity and Fairness Logic
-
-Both `recommend_songs()` and `Recommender.recommend()` use a greedy re-ranking loop that applies a penalty before each selection:
-
-- **Artist repeat penalty**: −0.30 if the artist already appears in the selected list
-- **Genre repeat penalty**: −0.15 if the genre already appears in the selected list
-
-This prevents the top-5 from being dominated by a single artist or genre even when one style strongly matches the user's preferences.
-
-### Challenge 4 — Visual Summary Table
-
-Output is formatted with the [`tabulate`](https://pypi.org/project/tabulate/) library using the `rounded_outline` theme. Each profile run prints a full recommendation table with columns for rank, title, artist, genre, score, and reasons. The strategy comparison also renders as a tabulate table.
-
-![Challenge implementation output — Conflicted Listener profile with Genre-First strategy and strategy comparison table](pics/challenge_implementation.png)
+Advanced attributes, multiple `RankingStrategy` presets, diversity penalties, and `tabulate` output are described in the original challenge specs—implementation lives in `src/recommender.py` and `src/main.py`.
 
 ---
 
-## Getting Started
+## Getting started
 
 ### Setup
 
@@ -181,72 +111,127 @@ Output is formatted with the [`tabulate`](https://pypi.org/project/tabulate/) li
    python -m venv .venv
    source .venv/bin/activate      # Mac or Linux
    .venv\Scripts\activate         # Windows
+   ```
 
-2. Install dependencies
+2. Install dependencies:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Configure local or cloud models (optional):
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Edit `.env` for `OLLAMA_MODEL`, `ECHO_OLLAMA_MODEL`, or `OLLAMA_BASE_URL`. For cloud: `ONLINE_LLM_PROVIDER=gemini` + `GEMINI_API_KEY` (e.g. `gemini-2.5-flash`), or `anthropic` + `ANTHROPIC_API_KEY`.
+
+4. Run the app:
+
+   ```bash
+   python -m src.main
+   ```
+
+### Ollama / cloud LLM (interactive + agentic)
+
+Local:
+
+```bash
+ollama pull llama3.2
+ollama serve
+```
+
+Cloud Anthropic (example):
+
+```bash
+pip install anthropic
+export ANTHROPIC_API_KEY="your-key"
+python -m src.main --interactive --provider anthropic
+```
+
+Cloud Gemini (example):
+
+```bash
+export ONLINE_LLM_PROVIDER="gemini"
+export GEMINI_API_KEY="your-key"
+export GEMINI_MODEL="gemini-2.5-flash"
+python -m streamlit run frontend/app.py
+```
+
+### Entry points
+
+| Command | Description |
+|---------|-------------|
+| `python -m src.main` | Batch mode (four profiles + strategy comparison) — fast mode by default |
+| `python -m src.main --batch --mode agentic` | Same profiles through EchoSphere-RAG (Ollama + seeded Chroma) |
+| `python -m src.main --audit` | Bias audit: console + JSON report |
+| `python -m src.main --interactive` | Conversational agent (fast pipeline + LLM tools) |
+| `python -m streamlit run frontend/app.py` | Web UI with fast/agentic toggle |
+| `python -m src.mcp_server` | MCP server (fast tools + `echosphere_*`) |
+| `python -m src.echosphere.vector_store` | Seed or rebuild Chroma from `data/songs.json` |
+| `python -m src.echosphere.graph` | Sample agentic query; prints final state JSON |
+
+### EchoSphere-RAG first run
 
 ```bash
 pip install -r requirements.txt
+ollama pull llama3.2
+ollama serve
+python -m src.echosphere.vector_store
+python -m src.echosphere.graph
 ```
 
-3. Run the app:
+Pipeline edges match `build_graph()` in `src/echosphere/graph.py`: **ingestor** → **researcher** → **reasoning**. Node behavior: `src/echosphere/nodes.py` (`ingestor_node`, `researcher_node`, `reasoning_node`). System diagram: [docs/architecture/WORKFLOWS.md](docs/architecture/WORKFLOWS.md).
 
-```bash
-python -m src.main
-```
-
-### Running Tests
-
-Run the starter tests with:
+### Running tests
 
 ```bash
 pytest
 ```
 
-You can add more tests in `tests/test_recommender.py`.
+Focused:
+
+```bash
+pytest tests/test_recommender.py
+```
+
+### MCP integration
+
+```bash
+python -m src.mcp_server
+```
+
+Example MCP config:
+
+```json
+{
+  "mcpServers": {
+    "groovegenius": {
+      "command": "python",
+      "args": ["-m", "src.mcp_server"],
+      "cwd": "/absolute/path/to/ai110-module3show-musicrecommendersimulation-starter"
+    }
+  }
+}
+```
+
+Tools include `recommend_manual`, `recommend`, `explain_song`, `audit_bias`, `list_catalog`, and agentic helpers `echosphere_recommend`, `echosphere_ingest`, `echosphere_explain`.
 
 ---
 
-## Experiments You Tried
+## Experiments
 
-### Weight Shift Experiment
-
-I designed and tested an experiment to see how changing the scoring weights affects which songs get recommended. The key question was: *If we adjust how much each factor (genre, mood, energy, acousticness) matters, do we get very different recommendations?*
-
-**How it worked:**
-I started with the default weights (35% genre, 30% mood, 25% energy, 10% acoustic) and then created a shifted configuration—doubling energy's importance (25% → 47%) and halving genre's (35% → 16%). Then I ran four user profiles through both weight configurations and compared the top-5 recommendations.
-
-**What I learned:**
-The weight shift produced more accurate results in 2 of 4 profiles. The clearest win was for a "Deep Intense Rock" profile, where a metal song with a perfect mood and energy match was rightly elevated over a rock song that only matched on genre. Some profiles saw only minor reorders, while an adversarial profile exposed limitations in both configurations.
-
-I used **Claude Code** to help me plan the experiment structure, design clear test cases, and organize the data collection so the results would be easy to interpret and compare.
-
-All experiment details and findings are documented here: [**docs/weight_shift_experiment.md**](docs/weight_shift_experiment.md)
-
+Scoring weight experiments and profile comparisons can be reproduced from the CLI profiles and `compare_strategies()` in `src/main.py`.
 
 ---
 
-## Limitations and Risks
+## Limitations and risks
 
-Summarize some limitations of your recommender.
-
-Examples:
-
-- It only works on a tiny catalog
-- It does not understand lyrics or language
-- It might over favor one genre or mood
-
-You will go deeper on this in your model card.
+Sparse catalog coverage, no lyrics semantics in fast mode, and residual bias under weak genre/mood support. Confidence and audit outputs flag issues but do not replace richer offline metrics.
 
 ---
 
-## Reflection
+## Reflection (AI collaboration)
 
-After running all four profiles, I compared them in pairs to understand how the scoring formula behaves under different conditions:
-- Chill Lofi vs Deep Intense Rock
-- High-Energy Pop vs Conflicted Listener
-- Deep Intense Rock vs Conflicted Listener
-
-Full pair comparison details: [**docs/reflection.md**](docs/reflection.md) 
-
-### Model Card
-→ [**Model Card**](model_card.md)
+Narrative on AI-assisted development, helpful vs flawed suggestions, and future work: **[docs/analysis/ai_collaboration_reflection.md](docs/analysis/ai_collaboration_reflection.md)**.
