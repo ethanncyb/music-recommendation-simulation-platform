@@ -7,7 +7,7 @@ import streamlit as st
 from frontend.components import (
     load_shared_state, render_results_table, render_confidence_badge,
     render_strategy_selector, render_mode_selector, render_agentic_results,
-    run_agentic, check_ollama_available, STRATEGIES,
+    run_agentic, check_ollama_available, get_online_llm, STRATEGIES,
 )
 from src.recommender import recommend_songs
 from src.guardrails import apply_guardrails
@@ -24,26 +24,53 @@ if mode == "agentic":
         "Agentic mode: EchoSphere-RAG LangGraph (Ingestor -> Researcher -> "
         "Reasoning) over ChromaDB + local Ollama."
     )
+elif mode == "agentic_online":
+    st.caption(
+        "Agentic mode (online LLM): EchoSphere-RAG LangGraph (Ingestor -> "
+        "Researcher -> Reasoning) over ChromaDB + online API "
+        "(configured via ONLINE_LLM_PROVIDER in .env)."
+    )
 
 tab_nl, tab_manual = st.tabs(["Natural Language", "Manual Profile"])
 
 # ── Tab A: Natural Language ──────────────────────────────────────────────
 
 with tab_nl:
-    ollama_ok = check_ollama_available()
-
-    if not ollama_ok:
-        st.warning(
-            "Ollama is not running. Natural language mode requires a local LLM. "
-            "Install Ollama (https://ollama.com) and run: `ollama pull llama3.2`. "
-            "Use the **Manual Profile** tab instead.",
-            icon="⚠️",
+    # Determine which LLM is available for this mode
+    if mode == "fast":
+        online_llm = None
+        llm_ready = False
+        st.info(
+            "Natural Language is disabled in Fast mode. "
+            "Natural Language recommendations require an LLM. "
+            "Switch to Agentic (local LLM) or Agentic (online LLM).",
+            icon="ℹ️",
         )
+    elif mode == "agentic_online":
+        online_llm, online_err = get_online_llm()
+        llm_ready = online_llm is not None
+        if not llm_ready:
+            st.warning(
+                f"Online LLM not available: {online_err}. "
+                "Configure ONLINE_LLM_PROVIDER plus matching API key/model in .env "
+                "(for Gemini, prefer GEMINI_MODEL=gemini-2.5-flash).",
+                icon="⚠️",
+            )
+    else:
+        online_llm = None
+        llm_ready = check_ollama_available()
+        if not llm_ready:
+            st.warning(
+                "Ollama is not running. Natural language mode requires a local LLM. "
+                "Install Ollama (https://ollama.com) and run: `ollama pull llama3.2`. "
+                "Use the **Manual Profile** tab instead, or switch to **Agentic (online LLM)** mode.",
+                icon="⚠️",
+            )
 
     query = st.text_input(
         "What kind of music are you looking for?",
         placeholder="e.g., moody driving music for a night road trip",
-        disabled=not ollama_ok,
+        disabled=not llm_ready,
         key="nl_query",
     )
 
@@ -51,14 +78,15 @@ with tab_nl:
     with col1:
         nl_k = st.number_input("Top-K", 1, 10, 5, key="nl_k")
 
-    if st.button("Recommend", disabled=not ollama_ok or not query, key="nl_btn"):
-        if mode == "agentic":
+    if st.button("Recommend", disabled=not llm_ready or not query, key="nl_btn"):
+        if mode in ("agentic", "agentic_online"):
+            llm_for_pipeline = online_llm if mode == "agentic_online" else None
             with st.spinner("Running EchoSphere-RAG pipeline..."):
                 profile = {
                     "genre": None, "mood": None,
                     "energy": 0.6, "likes_acoustic": False, "top_k": nl_k,
                 }
-                state = run_agentic(profile, query=query)
+                state = run_agentic(profile, query=query, llm=llm_for_pipeline)
             render_agentic_results(state)
             st.stop()
 
@@ -168,9 +196,23 @@ with tab_manual:
             "top_k": k,
         }
 
-        if mode == "agentic":
+        if mode in ("agentic", "agentic_online"):
+            if mode == "agentic_online":
+                online_llm_manual, online_err_manual = get_online_llm()
+                if not online_llm_manual:
+                    st.error(
+                        "Online LLM not available: "
+                        f"{online_err_manual}. "
+                        "Set ONLINE_LLM_PROVIDER plus matching API key/model in .env, "
+                        "then retry."
+                    )
+                    st.stop()
+                llm_for_manual = online_llm_manual
+            else:
+                llm_for_manual = None
+
             with st.spinner("Running EchoSphere-RAG pipeline..."):
-                state = run_agentic(profile)
+                state = run_agentic(profile, llm=llm_for_manual)
             render_agentic_results(state)
 
             scorer = st.session_state.confidence_scorer

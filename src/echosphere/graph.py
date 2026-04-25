@@ -8,15 +8,22 @@ Edges strictly follow the design doc:
 
 from __future__ import annotations
 
+import functools
 import json
 from typing import Any, Dict, Optional
 
-from .nodes import ingestor_node, reasoning_node, researcher_node
+from .nodes import ingestor_node, reasoning_node, researcher_node, _build_llm
 from .state import DEFAULT_DNA_PROFILE, EchoState
 
 
-def build_graph():
+def build_graph(llm=None):
     """Compile the 3-node LangGraph and return the runnable graph.
+
+    Args:
+        llm: Optional LLM instance for the reasoning node.  Accepts a
+             LangChain-compatible object **or** one of our ``LLMProvider``
+             subclasses (``GeminiProvider``, ``AnthropicProvider``, etc.).
+             When *None* the reasoning node falls back to local ``ChatOllama``.
 
     The import is local so that environments without ``langgraph`` installed
     can still import ``src.echosphere.nodes`` / ``state`` for unit tests that
@@ -24,10 +31,18 @@ def build_graph():
     """
     from langgraph.graph import END, START, StateGraph
 
+    # Wrap our LLMProvider if needed, once, so _build_llm isn't called per track.
+    resolved_llm = _build_llm(llm) if llm is not None else None
+
+    # Bind the resolved LLM to the reasoning node so LangGraph can call it
+    # with the standard single-arg (state) signature.
+    def _reasoning_with_llm(state):
+        return reasoning_node(state, llm=resolved_llm)
+
     graph = StateGraph(EchoState)
     graph.add_node("ingestor", ingestor_node)
     graph.add_node("researcher", researcher_node)
-    graph.add_node("reasoning", reasoning_node)
+    graph.add_node("reasoning", _reasoning_with_llm)
 
     graph.add_edge(START, "ingestor")
     graph.add_edge("ingestor", "researcher")
@@ -40,9 +55,15 @@ def build_graph():
 def run_echosphere(
     user_request: str,
     dna_profile: Optional[Dict[str, Any]] = None,
+    llm=None,
 ) -> Dict[str, Any]:
-    """Invoke the compiled graph on a single query and return the final state."""
-    app = build_graph()
+    """Invoke the compiled graph on a single query and return the final state.
+
+    Args:
+        llm: Optional LLM for the reasoning node (``LLMProvider`` or
+             LangChain-compatible). Defaults to local ChatOllama.
+    """
+    app = build_graph(llm=llm)
     initial_state: EchoState = {
         "user_request": user_request,
         "dna_profile": dna_profile or dict(DEFAULT_DNA_PROFILE),

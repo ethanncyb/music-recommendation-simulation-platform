@@ -149,8 +149,15 @@ def profile_to_dna(user_prefs: dict) -> dict:
     return dna
 
 
-def run_profile_agentic(name: str, user_prefs: dict, songs: list) -> None:
-    """EchoSphere-RAG path: LangGraph + ChromaDB + ChatOllama."""
+def run_profile_agentic(name: str, user_prefs: dict, songs: list,
+                        llm=None) -> None:
+    """EchoSphere-RAG path: LangGraph + ChromaDB + LLM.
+
+    Args:
+        llm: Optional LLM for the reasoning node. When *None* the pipeline
+             uses local ChatOllama. Pass a ``GeminiProvider`` or
+             ``AnthropicProvider`` to use an online model instead.
+    """
     from .echosphere import run_echosphere
 
     dna = profile_to_dna(user_prefs)
@@ -160,13 +167,14 @@ def run_profile_agentic(name: str, user_prefs: dict, songs: list) -> None:
         f"likes_acoustic={dna['likes_acoustic']}."
     )
 
+    llm_label = "local Ollama" if llm is None else f"{type(llm).__name__}"
     print(f"\n{'='*60}")
-    print(f"  Profile: {name}  [Mode: agentic — EchoSphere-RAG]")
+    print(f"  Profile: {name}  [Mode: agentic — EchoSphere-RAG, LLM: {llm_label}]")
     print(f"  genre={dna['genre']} | mood={dna['mood']} | "
           f"energy={dna['energy']} | likes_acoustic={dna['likes_acoustic']}")
     print("=" * 60)
 
-    state = run_echosphere(user_request, dna)
+    state = run_echosphere(user_request, dna, llm=llm)
 
     if state.get("error"):
         print(f"\n  [Pipeline error] {state['error']}\n")
@@ -220,9 +228,10 @@ def run_profile_agentic(name: str, user_prefs: dict, songs: list) -> None:
 
 
 def run_profile(name: str, user_prefs: dict, songs: list,
-                strategy: RankingStrategy = DEFAULT, mode: str = "fast") -> None:
+                strategy: RankingStrategy = DEFAULT, mode: str = "fast",
+                llm=None) -> None:
     if mode == "agentic":
-        run_profile_agentic(name, user_prefs, songs)
+        run_profile_agentic(name, user_prefs, songs, llm=llm)
         return
 
     print(f"\n{'='*60}")
@@ -284,20 +293,12 @@ def run_interactive(songs: list, provider: str = "ollama", model: str = None) ->
     from .guardrails import format_confidence_badge
 
     load_dotenv()
-    # Default model per provider
-    if model is None:
-        model = {
-            "ollama": "llama3.2",
-            "anthropic": "claude-sonnet-4-20250514",
-            "gemini": "gemma-4-27b-it",
-        }.get(provider, "llama3.2")
 
     print(f"\nGrooveGenius 2.0 — Interactive Mode")
-    print(f"Using: {provider}/{model}")
-    print(f"Type your request, or 'quit' to exit.\n")
 
     try:
-        llm = get_provider(provider, model=model)
+        kwargs = {"model": model} if model else {}
+        llm = get_provider(provider, **kwargs)
     except (ConnectionError, ValueError, ImportError) as e:
         print(f"Error: {e}")
         if provider == "ollama":
@@ -305,6 +306,9 @@ def run_interactive(songs: list, provider: str = "ollama", model: str = None) ->
         elif provider == "gemini":
             print("Get a free Gemini API key at https://aistudio.google.com/apikey")
         return
+
+    print(f"Using: {provider}/{llm.model}")
+    print(f"Type your request, or 'quit' to exit.\n")
 
     knowledge = load_knowledge()
     agent = AgentLoop(llm=llm, songs=songs, knowledge=knowledge)
@@ -386,22 +390,18 @@ def run_batch_online(songs: list, provider: str = "gemini", model: str = None) -
     from .confidence import ConfidenceReport
 
     load_dotenv()
-    if model is None:
-        model = {
-            "anthropic": "claude-sonnet-4-20250514",
-            "gemini": "gemma-4-27b-it",
-        }.get(provider, "gemma-4-27b-it")
-
     print(f"\nGrooveGenius 2.0 — Online LLM Batch Demo")
-    print(f"Using: {provider}/{model}\n")
 
     try:
-        llm = get_provider(provider, model=model)
+        kwargs = {"model": model} if model else {}
+        llm = get_provider(provider, **kwargs)
     except (ConnectionError, ValueError, ImportError) as e:
         print(f"Error: {e}")
         if provider == "gemini":
             print("Get a free Gemini API key at https://aistudio.google.com/apikey")
         return
+
+    print(f"Using: {provider}/{llm.model}\n")
 
     knowledge = load_knowledge()
     agent = AgentLoop(llm=llm, songs=songs, knowledge=knowledge)
@@ -464,15 +464,17 @@ def run_batch_online(songs: list, provider: str = "gemini", model: str = None) -
         print()
 
 
-def run_batch(songs: list, mode: str = "fast") -> None:
+def run_batch(songs: list, mode: str = "fast", llm=None) -> None:
     """Run the default batch profile demo.
 
     ``mode='fast'`` uses the deterministic weighted scorer (original GrooveGenius
     pipeline). ``mode='agentic'`` routes every profile through the new
-    EchoSphere-RAG LangGraph pipeline (requires Ollama + a seeded ChromaDB).
+    EchoSphere-RAG LangGraph pipeline (requires a seeded ChromaDB; uses local
+    Ollama unless *llm* is provided).
     """
     for name, prefs in PROFILES.items():
-        run_profile(name, prefs, songs, PROFILE_STRATEGIES.get(name, DEFAULT), mode=mode)
+        run_profile(name, prefs, songs, PROFILE_STRATEGIES.get(name, DEFAULT),
+                    mode=mode, llm=llm)
     if mode == "fast":
         compare_strategies(PROFILES["Conflicted Listener"], songs, "Conflicted Listener")
 
@@ -533,14 +535,15 @@ def run_menu(songs: list) -> None:
     while True:
         print("\nGrooveGenius 2.0")
         print("1) Run profile demo (batch, fast mode)")
-        print("2) Run profile demo (batch, agentic EchoSphere-RAG)")
-        print("3) Run profile demo (batch, online LLM)")
-        print("4) Run bias audit")
-        print("5) Start chatbot mode")
-        print("6) Run tests")
-        print("7) Exit")
+        print("2) Run profile demo (batch, agentic EchoSphere-RAG, local LLM)")
+        print("3) Run profile demo (batch, agentic EchoSphere-RAG, online LLM)")
+        print("4) Run profile demo (batch, online LLM)")
+        print("5) Run bias audit")
+        print("6) Start chatbot mode")
+        print("7) Run tests")
+        print("8) Exit")
 
-        choice = input("\nSelect an option [1-7]: ").strip()
+        choice = input("\nSelect an option [1-8]: ").strip()
 
         if choice == "1":
             run_batch(songs, mode="fast")
@@ -550,21 +553,32 @@ def run_menu(songs: list) -> None:
             provider, model = _get_online_provider()
             if provider is None:
                 continue
-            run_batch_online(songs, provider=provider, model=model)
+            from .llm_provider import get_provider
+            try:
+                llm = get_provider(provider, model=model)
+            except (ConnectionError, ValueError, ImportError) as e:
+                print(f"Error: {e}")
+                continue
+            run_batch(songs, mode="agentic", llm=llm)
         elif choice == "4":
-            run_audit(songs)
+            provider, model = _get_online_provider()
+            if provider is None:
+                continue
+            run_batch_online(songs, provider=provider, model=model)
         elif choice == "5":
+            run_audit(songs)
+        elif choice == "6":
             provider, model = _select_chatbot_provider()
             if provider is None:
                 continue
             run_interactive(songs, provider=provider, model=model)
-        elif choice == "6":
-            run_tests()
         elif choice == "7":
+            run_tests()
+        elif choice == "8":
             print("Goodbye.")
             break
         else:
-            print("Invalid selection. Please choose 1-7.")
+            print("Invalid selection. Please choose 1-8.")
 
 
 def main() -> None:

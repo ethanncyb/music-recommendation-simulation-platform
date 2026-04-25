@@ -137,7 +137,7 @@ def main():
     parser.add_argument("--backend", default="ollama", choices=["ollama", "anthropic", "gemini"],
                         help="LLM backend (default: ollama)")
     parser.add_argument("--model", default=None,
-                        help="Model name (default: llama3.2 for ollama, claude-sonnet-4-20250514 for anthropic, gemma-4-27b-it for gemini)")
+                        help="Model name override (reads from OLLAMA_MODEL / ANTHROPIC_MODEL / GEMINI_MODEL env vars by default)")
     parser.add_argument("--output-dir", default="data/knowledge",
                         help="Output directory for JSON files (default: data/knowledge)")
     parser.add_argument("--catalog-path", default="data/songs.json",
@@ -145,13 +145,6 @@ def main():
     args = parser.parse_args()
 
     load_dotenv()
-    # Set default model per backend
-    if args.model is None:
-        args.model = {
-            "ollama": "llama3.2",
-            "anthropic": "claude-sonnet-4-20250514",
-            "gemini": "gemma-4-27b-it",
-        }.get(args.backend, "llama3.2")
 
     os.makedirs(args.output_dir, exist_ok=True)
 
@@ -162,17 +155,17 @@ def main():
     moods = extract_unique_values(songs, "mood")
     print(f"Found {len(genres)} unique genres and {len(moods)} unique moods.\n")
 
-    print(f"Connecting to {args.backend} ({args.model})...")
-    kwargs = {"model": args.model}
+    kwargs = {"model": args.model} if args.model else {}
     llm = get_provider(args.backend, **kwargs)
+    print(f"Connecting to {args.backend} ({llm.model})...")
 
     print("\n--- Genre Similarity Graph ---")
     genre_similarities = generate_graph(llm, genres, "genre")
-    save_graph(genre_similarities, genres, "genre", args.output_dir, args.backend, args.model)
+    save_graph(genre_similarities, genres, "genre", args.output_dir, args.backend, llm.model)
 
     print("\n--- Mood Similarity Graph ---")
     mood_similarities = generate_graph(llm, moods, "mood")
-    save_graph(mood_similarities, moods, "mood", args.output_dir, args.backend, args.model)
+    save_graph(mood_similarities, moods, "mood", args.output_dir, args.backend, llm.model)
 
     print("\nDone! Knowledge base generated successfully.")
 

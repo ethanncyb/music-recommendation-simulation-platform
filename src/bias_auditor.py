@@ -51,7 +51,8 @@ class AuditReport:
     biases: List[BiasSignature]
     catalog_stats: Dict
     profile_summaries: List[Dict] = field(default_factory=list)
-    # "fast" (weighted scoring) or "agentic" (EchoSphere-RAG LangGraph).
+    # "fast" (weighted scoring), "agentic" (EchoSphere + local Ollama), or
+    # "agentic_online" (EchoSphere + ONLINE_LLM_PROVIDER).
     pipeline: str = "fast"
 
 
@@ -134,26 +135,55 @@ class BiasAuditor:
         # Fallback: most common mood
         return self.mood_counts.most_common(1)[0][0]
 
+    def _resolve_online_llm(self):
+        """Build the cloud LLM used when pipeline is agentic_online."""
+        from .env_config import load_dotenv
+        from .llm_provider import get_provider
+
+        load_dotenv()
+        provider_name = os.environ.get("ONLINE_LLM_PROVIDER", "").strip().lower()
+        if provider_name not in {"anthropic", "gemini"}:
+            raise ValueError(
+                "pipeline 'agentic_online' requires ONLINE_LLM_PROVIDER to be "
+                "'anthropic' or 'gemini' in .env (and the matching API key)."
+            )
+        try:
+            return get_provider(provider_name)
+        except (ConnectionError, ValueError, ImportError) as exc:
+            raise ValueError(
+                f"Could not initialize online LLM ({provider_name!r}): {exc}"
+            ) from exc
+
     def run_audit(self, k: int = 5, pipeline: str = "fast") -> AuditReport:
         """Run the full audit pipeline and return a report.
 
         Args:
             k: number of top recommendations to analyse per profile.
             pipeline: ``"fast"`` runs the deterministic weighted scorer;
-                ``"agentic"`` routes every synthetic profile through the
-                EchoSphere-RAG LangGraph pipeline and evaluates the retrieved
-                tracks. Agentic mode requires Ollama + a seeded ChromaDB.
+                ``"agentic"`` routes every profile through EchoSphere-RAG with
+                local Ollama; ``"agentic_online"`` uses the same graph with
+                ``ONLINE_LLM_PROVIDER`` (Anthropic or Gemini). Agentic modes
+                need a seeded ChromaDB.
         """
-        if pipeline not in {"fast", "agentic"}:
-            raise ValueError(f"pipeline must be 'fast' or 'agentic', got {pipeline!r}")
+        allowed = {"fast", "agentic", "agentic_online"}
+        if pipeline not in allowed:
+            raise ValueError(
+                f"pipeline must be one of {sorted(allowed)}, got {pipeline!r}"
+            )
+
+        agentic_llm = None
+        if pipeline == "agentic_online":
+            agentic_llm = self._resolve_online_llm()
+
+        use_agentic = pipeline in {"agentic", "agentic_online"}
 
         profiles = self.generate_audit_profiles()
         profile_results = []
         all_results_for_coverage = []
 
         for profile in profiles:
-            if pipeline == "agentic":
-                results = self._run_agentic_profile(profile, k=k)
+            if use_agentic:
+                results = self._run_agentic_profile(profile, k=k, llm=agentic_llm)
             else:
                 results = recommend_songs(
                     profile, self.songs, k=k,
@@ -194,7 +224,7 @@ class BiasAuditor:
         coverage = catalog_coverage(all_results_for_coverage, len(self.songs))
 
         strategy_name = (
-            "echosphere-rag" if pipeline == "agentic" else self.strategy.name
+            "echosphere-rag" if use_agentic else self.strategy.name
         )
 
         return AuditReport(
@@ -214,13 +244,18 @@ class BiasAuditor:
             pipeline=pipeline,
         )
 
-    def _run_agentic_profile(self, profile: Dict, k: int = 5) -> List[Tuple]:
+    def _run_agentic_profile(
+        self, profile: Dict, k: int = 5, llm=None,
+    ) -> List[Tuple]:
         """Run one synthetic profile through the EchoSphere-RAG pipeline.
 
         Returns the fast-mode tuple shape ``List[Tuple[song_dict, score, str]]``
         so the existing detectors / metrics keep working. The score is a
         Chroma cosine-similarity (``1 - distance``) and the "reason" string is
         the Reasoning-node explanation (or an empty string on LLM failure).
+
+        Args:
+            llm: Optional reasoning LLM (cloud provider). ``None`` uses local Ollama.
         """
         from .echosphere import run_echosphere
         from .echosphere.state import DEFAULT_DNA_PROFILE
@@ -244,7 +279,7 @@ class BiasAuditor:
             f"likes_acoustic={likes_acoustic}"
         )
         try:
-            state = run_echosphere(user_request, dna)
+            state = run_echosphere(user_request, dna, llm=llm)
         except Exception as exc:
             # Degrade gracefully so one bad profile doesn't break the audit.
             state = {"retrieved_tracks": [], "explanations": [], "error": str(exc)}

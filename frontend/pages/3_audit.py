@@ -11,7 +11,11 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 from frontend.components import (
-    load_shared_state, render_mode_selector, render_strategy_selector, STRATEGIES,
+    load_shared_state,
+    render_mode_selector,
+    render_strategy_selector,
+    STRATEGIES,
+    get_online_llm,
 )
 from src.bias_auditor import BiasAuditor, AuditReport, BiasSignature
 
@@ -66,15 +70,27 @@ with load_col:
     load_latest_clicked = st.button("Load Latest Saved Report", key="audit_load_latest")
 
 if run_audit_clicked:
+    if mode == "agentic_online":
+        _oll, online_err = get_online_llm()
+        if _oll is None:
+            st.error(
+                f"Online LLM is not configured: {online_err} "
+                "Set ONLINE_LLM_PROVIDER and the matching API key in .env, then retry."
+            )
+            st.stop()
     spinner_msg = (
         "Running agentic bias audit (EchoSphere-RAG per profile — this is slow)..."
-        if mode == "agentic"
+        if mode in ("agentic", "agentic_online")
         else "Running bias audit across synthetic profiles..."
     )
     with st.spinner(spinner_msg):
         knowledge = st.session_state.knowledge if use_rag else None
         auditor = BiasAuditor(st.session_state.songs, strategy=strategy, knowledge=knowledge)
-        report = auditor.run_audit(pipeline=mode)
+        try:
+            report = auditor.run_audit(pipeline=mode)
+        except ValueError as exc:
+            st.error(str(exc))
+            st.stop()
         st.session_state["audit_report"] = report
         auditor.save_report(report)
 
@@ -121,7 +137,7 @@ if report.biases:
             "Suggestion": b.suggestion,
         })
     bias_df = pd.DataFrame(bias_rows)
-    st.dataframe(bias_df, use_container_width=True, hide_index=True)
+    st.dataframe(bias_df, width="stretch", hide_index=True)
 else:
     st.success("No biases detected.")
 
@@ -160,7 +176,7 @@ fig.update_layout(
     yaxis_title="Genre",
     xaxis_tickangle=-45,
 )
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width="stretch")
 
 # ── Score Distribution by Energy Group ───────────────────────────────────
 
@@ -185,7 +201,7 @@ if summaries:
         labels={"top1_score": "Top-1 Score", "energy_group": "Energy Group"},
         color="energy_group",
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
     # Acoustic comparison
     sum_df["acoustic_label"] = sum_df["likes_acoustic"].map({True: "Acoustic", False: "Non-Acoustic"})
@@ -195,4 +211,4 @@ if summaries:
         labels={"top1_score": "Top-1 Score", "acoustic_label": "Preference"},
         color="acoustic_label",
     )
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, width="stretch")

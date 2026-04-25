@@ -95,7 +95,8 @@ class OllamaProvider(LLMProvider):
 class AnthropicProvider(LLMProvider):
     """Cloud LLM via Anthropic API (optional provider)."""
 
-    def __init__(self, model: str = "claude-sonnet-4-20250514"):
+    def __init__(self, model: Optional[str] = None):
+        load_dotenv()
         try:
             import anthropic
         except ImportError:
@@ -108,7 +109,7 @@ class AnthropicProvider(LLMProvider):
                 "Set ANTHROPIC_API_KEY environment variable to use the Anthropic provider"
             )
         self.client = anthropic.Anthropic(api_key=api_key)
-        self.model = model
+        self.model = model or os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-20250514")
 
     def generate(self, prompt: str, system: Optional[str] = None) -> str:
         kwargs = {
@@ -125,7 +126,7 @@ class AnthropicProvider(LLMProvider):
 class GeminiProvider(LLMProvider):
     """Google Gemini API provider (free tier supported)."""
 
-    def __init__(self, model: str = "gemma-4-27b-it"):
+    def __init__(self, model: Optional[str] = None):
         load_dotenv()
         api_key = os.environ.get("GEMINI_API_KEY")
         if not api_key:
@@ -134,8 +135,49 @@ class GeminiProvider(LLMProvider):
                 "Get a free key at https://aistudio.google.com/apikey"
             )
         self.api_key = api_key
-        self.model = model
+        self.model = model or os.getenv("GEMINI_MODEL", "gemma-4-31b-it")
         self.base_url = "https://generativelanguage.googleapis.com/v1beta"
+        self._validate_model_supports_generate_content()
+
+    def _validate_model_supports_generate_content(self) -> None:
+        """Fail fast when GEMINI_MODEL is invalid for generateContent."""
+        import urllib.request
+        import urllib.error
+
+        model_url = f"{self.base_url}/models/{self.model}?key={self.api_key}"
+        req = urllib.request.Request(model_url, headers={"Content-Type": "application/json"})
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                body = json.loads(resp.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            error_body = e.read().decode("utf-8", errors="replace")
+            try:
+                detail = json.loads(error_body).get("error", {}).get("message", error_body)
+            except json.JSONDecodeError:
+                detail = error_body
+            if e.code == 404:
+                raise ValueError(
+                    f"Gemini model '{self.model}' is not available on v1beta. "
+                    "Pick a model that supports generateContent (for example "
+                    "'gemini-2.5-flash'). "
+                    f"Detail: {detail}"
+                )
+            raise ConnectionError(
+                f"Gemini API error while validating model '{self.model}' "
+                f"(HTTP {e.code}): {detail}"
+            )
+        except urllib.error.URLError as e:
+            raise ConnectionError(
+                f"Cannot reach Gemini API while validating model '{self.model}': "
+                f"{e.reason}. Check your internet connection."
+            )
+
+        supported = body.get("supportedGenerationMethods") or []
+        if "generateContent" not in supported:
+            raise ValueError(
+                f"Gemini model '{self.model}' does not support generateContent. "
+                f"Supported methods: {supported or 'none reported'}."
+            )
 
     def generate(self, prompt: str, system: Optional[str] = None) -> str:
         import urllib.request
@@ -195,6 +237,13 @@ class GeminiProvider(LLMProvider):
             elif e.code == 400:
                 raise ValueError(
                     f"Gemini API bad request (HTTP 400). Detail: {msg}"
+                )
+            elif e.code == 404:
+                raise ValueError(
+                    f"Gemini model '{self.model}' is unavailable for "
+                    f"generateContent on v1beta (HTTP 404). "
+                    "Choose a supported model (for example 'gemini-2.5-flash'). "
+                    f"Detail: {msg}"
                 )
             else:
                 raise ConnectionError(

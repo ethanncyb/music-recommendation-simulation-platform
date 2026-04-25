@@ -25,8 +25,9 @@ STRATEGIES = {
 }
 
 MODES = {
-    "Fast (deterministic)": "fast",
-    "Agentic (EchoSphere-RAG)": "agentic",
+    "Fast (algorithm only)": "fast",
+    "Agentic (local LLM)": "agentic",
+    "Agentic (online LLM)": "agentic_online",
 }
 
 
@@ -59,14 +60,19 @@ def load_shared_state():
 
 
 def render_mode_selector(key: str = "mode_selector") -> str:
-    """Sidebar toggle between fast and agentic modes. Returns 'fast'|'agentic'."""
+    """Sidebar toggle between fast, agentic (local), and agentic (online).
+
+    Returns ``'fast'``, ``'agentic'``, or ``'agentic_online'``.
+    """
     label = st.sidebar.radio(
         "Recommendation mode",
         list(MODES.keys()),
         key=key,
         help=(
             "Fast = deterministic weighted scoring (no LLM). "
-            "Agentic = EchoSphere-RAG LangGraph over ChromaDB + Ollama."
+            "Agentic (local LLM) = EchoSphere-RAG over ChromaDB + Ollama. "
+            "Agentic (online LLM) = EchoSphere-RAG over ChromaDB + online API "
+            "(set ONLINE_LLM_PROVIDER, GEMINI_API_KEY / ANTHROPIC_API_KEY in .env)."
         ),
     )
     mode = MODES[label]
@@ -101,8 +107,36 @@ def profile_to_dna(user_prefs: Dict) -> Dict:
     return dna
 
 
-def run_agentic(user_prefs: Dict, query: Optional[str] = None) -> Dict:
-    """Execute the EchoSphere-RAG pipeline and return the final state dict."""
+def get_online_llm():
+    """Create an online LLM provider from .env config. Returns provider or None."""
+    load_dotenv()
+    provider_name = os.environ.get("ONLINE_LLM_PROVIDER", "").strip().lower()
+    model_by_provider = {
+        "gemini": os.environ.get("GEMINI_MODEL", "").strip() or "(default)",
+        "anthropic": os.environ.get("ANTHROPIC_MODEL", "").strip() or "(default)",
+    }
+    if provider_name not in {"anthropic", "gemini"}:
+        return None, (
+            "ONLINE_LLM_PROVIDER not set in .env (must be 'anthropic' or 'gemini')."
+        )
+    try:
+        from src.llm_provider import get_provider
+        llm = get_provider(provider_name)
+        return llm, None
+    except (ConnectionError, ValueError, ImportError) as e:
+        model_name = model_by_provider.get(provider_name, "(unknown)")
+        return None, (
+            f"{e} "
+            f"[provider={provider_name}, model={model_name}]"
+        )
+
+
+def run_agentic(user_prefs: Dict, query: Optional[str] = None, llm=None) -> Dict:
+    """Execute the EchoSphere-RAG pipeline and return the final state dict.
+
+    Args:
+        llm: Optional LLM for the reasoning node. When *None* uses local Ollama.
+    """
     from src.echosphere import run_echosphere
 
     dna = profile_to_dna(user_prefs)
@@ -111,7 +145,7 @@ def run_agentic(user_prefs: Dict, query: Optional[str] = None) -> Dict:
             f"Recommend {dna.get('genre') or 'music'} with "
             f"{dna.get('mood') or 'any'} mood at energy {dna['energy']}."
         )
-    return run_echosphere(query, dna)
+    return run_echosphere(query, dna, llm=llm)
 
 
 def render_agentic_results(state: Dict):
@@ -141,7 +175,7 @@ def render_agentic_results(state: Dict):
             "Energy": f"{float(track.get('energy', 0)):.2f}",
             "Distance": f"{float(track.get('distance') or 0):.4f}",
         })
-    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+    st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
 
     for rank, track in enumerate(retrieved, 1):
         with st.expander(f"#{rank} — {track.get('title')} by {track.get('artist')}"):
@@ -172,7 +206,7 @@ def render_results_table(results: List[Tuple]):
         })
 
     df = pd.DataFrame(rows)
-    st.dataframe(df, use_container_width=True, hide_index=True)
+    st.dataframe(df, width="stretch", hide_index=True)
 
 
 def render_confidence_badge(report: ConfidenceReport):

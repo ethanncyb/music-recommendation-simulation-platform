@@ -151,4 +151,4 @@ Tests use the OOP interface; `main.py` uses the functional interface directly.
 
 - Default provider is local Ollama (`--provider ollama`) and expects `llama3.2` to be available.
 - Anthropic is optional: install `anthropic` and set `ANTHROPIC_API_KEY`, then run with `--provider anthropic`.
-- Gemini is optional (free tier): set `GEMINI_API_KEY`, then run with `--provider gemini`. Default model is `gemma-4-27b-it`.
+- Gemini is optional (free tier): set `GEMINI_API_KEY`, then run with `--provider gemini`. Default model is `gemma-4-31b-it`.

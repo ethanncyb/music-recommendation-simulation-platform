@@ -62,7 +62,7 @@ df = pd.DataFrame([
     for s in filtered
 ])
 
-st.dataframe(df, use_container_width=True, hide_index=True)
+st.dataframe(df, width="stretch", hide_index=True)
 st.caption(f"Showing {len(filtered)} of {len(songs)} songs")
 
 # ── Strategy Comparison ──────────────────────────────────────────────────
@@ -102,7 +102,7 @@ if st.button("Compare Strategies", key="cmp_btn"):
             })
 
     cmp_df = pd.DataFrame(rows)
-    st.dataframe(cmp_df, use_container_width=True, hide_index=True)
+    st.dataframe(cmp_df, width="stretch", hide_index=True)
 
     # Bar chart of scores
     fig = px.bar(
@@ -111,7 +111,7 @@ if st.button("Compare Strategies", key="cmp_btn"):
         text="Score",
     )
     fig.update_layout(showlegend=False, yaxis_range=[0, 1.3])
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
 # ── Score Distribution ───────────────────────────────────────────────────
 
@@ -143,9 +143,9 @@ if st.button("Show Distribution", key="dist_btn"):
         hover_data=["Artist", "Genre"],
     )
     fig.update_layout(xaxis_tickangle=-45, height=500)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
-    st.dataframe(score_df, use_container_width=True, hide_index=True)
+    st.dataframe(score_df, width="stretch", hide_index=True)
 
 # ── Vector Nearest-Neighbors (EchoSphere ChromaDB) ───────────────────────
 
@@ -184,7 +184,7 @@ if st.button("Find nearest neighbors", key="nn_btn"):
                 "Energy": meta.get("energy"),
                 "Distance": round(float(distances[idx]), 4) if idx < len(distances) else None,
             })
-        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+        st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
     except Exception as exc:
         st.error(
             f"ChromaDB unavailable: {exc}. Seed it with "

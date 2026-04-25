@@ -230,8 +230,45 @@ def _format_dna_summary(dna: Dict[str, Any]) -> str:
     return "\n".join(parts) if parts else "  (no targets specified)"
 
 
-def _build_llm():
-    """Instantiate ChatOllama. Lazy so tests can patch before construction."""
+class _LLMProviderAdapter:
+    """Wraps an ``LLMProvider`` to expose a LangChain-style ``.invoke()`` method.
+
+    This lets the reasoning node use our ``GeminiProvider`` / ``AnthropicProvider``
+    without requiring the full ``langchain-google-genai`` or ``langchain-anthropic``
+    packages.
+    """
+
+    def __init__(self, provider):
+        self._provider = provider
+
+    def invoke(self, messages):
+        system = None
+        prompt = ""
+        for msg in messages:
+            role = getattr(msg, "type", None)
+            content = getattr(msg, "content", str(msg))
+            if role == "system":
+                system = content
+            else:
+                prompt = content
+        text = self._provider.generate(prompt, system=system)
+        return _FallbackMessage("ai", text)
+
+
+def _build_llm(llm_override=None):
+    """Build or wrap an LLM for the reasoning node.
+
+    If *llm_override* is an ``LLMProvider`` instance (from our provider layer),
+    wrap it in ``_LLMProviderAdapter`` so it speaks the LangChain protocol.
+    Otherwise fall back to ``ChatOllama``.
+    """
+    if llm_override is not None:
+        from ..llm_provider import LLMProvider
+        if isinstance(llm_override, LLMProvider):
+            return _LLMProviderAdapter(llm_override)
+        # Already a LangChain-compatible object (e.g. ChatOllama passed directly)
+        return llm_override
+
     from langchain_ollama import ChatOllama  # local import — optional dep
 
     load_dotenv()
@@ -298,7 +335,7 @@ def reasoning_node(state: EchoState, llm: Optional[Any] = None) -> EchoState:
         except Exception as exc:
             return {
                 "explanations": [],
-                "error": f"reasoning: failed to init ChatOllama: {exc}",
+                "error": f"reasoning: failed to init LLM: {exc}",
             }
 
     dna_summary = _format_dna_summary(dna)
