@@ -88,6 +88,8 @@ with tab_nl:
                 }
                 state = run_agentic(profile, query=query, llm=llm_for_pipeline)
             render_agentic_results(state)
+            if state.get("agent_log_path"):
+                st.caption(f"Session log saved: `{state['agent_log_path']}`")
             st.stop()
 
         with st.spinner("Agent is thinking..."):
@@ -214,6 +216,8 @@ with tab_manual:
             with st.spinner("Running EchoSphere-RAG pipeline..."):
                 state = run_agentic(profile, llm=llm_for_manual)
             render_agentic_results(state)
+            if state.get("agent_log_path"):
+                st.caption(f"Session log saved: `{state['agent_log_path']}`")
 
             scorer = st.session_state.confidence_scorer
             confidence = scorer.compute(profile, state)

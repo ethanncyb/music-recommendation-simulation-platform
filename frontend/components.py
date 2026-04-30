@@ -138,6 +138,7 @@ def run_agentic(user_prefs: Dict, query: Optional[str] = None, llm=None) -> Dict
         llm: Optional LLM for the reasoning node. When *None* uses local Ollama.
     """
     from src.echosphere import run_echosphere
+    from src.agent_logger import AgentLogger
 
     dna = profile_to_dna(user_prefs)
     if not query:
@@ -145,7 +146,33 @@ def run_agentic(user_prefs: Dict, query: Optional[str] = None, llm=None) -> Dict
             f"Recommend {dna.get('genre') or 'music'} with "
             f"{dna.get('mood') or 'any'} mood at energy {dna['energy']}."
         )
-    return run_echosphere(query, dna, llm=llm)
+    logger = AgentLogger()
+    logger.log_step(
+        "streamlit_agentic_request",
+        input_data={
+            "query": query,
+            "user_prefs": user_prefs,
+            "dna_profile": dna,
+            "mode": st.session_state.get("mode", "unknown"),
+            "llm_provider": llm.__class__.__name__ if llm is not None else "ollama_local",
+        },
+    )
+
+    state = run_echosphere(query, dna, llm=llm)
+
+    retrieved = state.get("retrieved_tracks") or []
+    logger.log_step(
+        "streamlit_agentic_response",
+        output_data={
+            "error": state.get("error"),
+            "retrieved_count": len(retrieved),
+            "top_title": retrieved[0].get("title") if retrieved else None,
+            "has_explanations": bool(state.get("explanations")),
+        },
+    )
+    log_path = logger.save()
+    state["agent_log_path"] = log_path
+    return state
 
 
 def render_agentic_results(state: Dict):
